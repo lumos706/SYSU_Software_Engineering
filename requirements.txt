@@ -1,0 +1,4 @@
+flask~=3.0.3
+werkzeug~=3.0.2
+pymysql~=1.1.1
+sqlalchemy~=2.0.36

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>选择登录类型</title>
+    <link rel="stylesheet" href="/static/css/layui.css">
+</head>
+<body>
+    <div class="demo-login-container" style="width: 320px; margin: 200px auto; text-align: center;">
+        <div class="demo-login-title" style="font-size: 24px; font-weight: bold; margin-bottom: 20px;">请选择登录角色</div>
+
+        <form method="POST">
+            <div class="layui-form-item">
+                <button type="submit" class="layui-btn layui-btn-fluid" name="role" value="user">用户登录</button>
+            </div>
+            <div class="layui-form-item">
+                <button type="submit" class="layui-btn layui-btn-fluid" name="role" value="admin">管理员登录</button>
+            </div>
+            <div class="layui-form-item">
+                <button type="submit" class="layui-btn layui-btn-fluid" name="role" value="pilot">操作员登录</button>
+            </div>
+        </form>
+    </div>
+
+    <script src="/static/layui.js"></script>
+</body>
+</html>

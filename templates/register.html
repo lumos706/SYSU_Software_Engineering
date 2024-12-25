@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Demo</title>
+  <!-- 请勿在项目正式环境中引用该 layui.css 地址 -->
+  <link href="../static/css/layui.css" rel="stylesheet">
+</head>
+<body>
+<style>
+.demo-reg-container{width: 320px; margin: 200px auto 0;}
+.demo-reg-title{font-size: 20px; color: #333; text-align: center; margin-bottom: 20px;}
+.demo-reg-other .layui-icon{position: relative; display: inline-block; margin: 0 2px; top: 2px; font-size: 26px;}
+</style>
+<form class="layui-form" method="POST">
+  <div class="demo-reg-container">
+    <div class="demo-reg-title">注册</div>
+    <div class="layui-form-item">
+      <div class="layui-row">
+        <div class="layui-col-xs7">
+          <div class="layui-input-wrap">
+            <div class="layui-input-prefix">
+              <i class="layui-icon layui-icon-cellphone"></i>
+            </div>
+            <input type="text" name="contact_info" value="" lay-verify="required|phone" placeholder="手机号" lay-reqtext="请填写手机号" autocomplete="off" class="layui-input" id="reg-cellphone">
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="layui-form-item">
+      <div class="layui-input-wrap">
+        <div class="layui-input-prefix">
+          <i class="layui-icon layui-icon-password"></i>
+        </div>
+        <input type="password" name="password" value="" lay-verify="required" placeholder="密码" autocomplete="off" class="layui-input" id="reg-password" lay-affix="eye">
+      </div>
+    </div>
+    <div class="layui-form-item">
+      <div class="layui-input-wrap">
+        <div class="layui-input-prefix">
+          <i class="layui-icon layui-icon-password"></i>
+        </div>
+        <input type="password" name="confirmPassword" value="" lay-verify="required|confirmPassword" placeholder="确认密码" autocomplete="off" class="layui-input" lay-affix="eye">
+      </div>
+    </div>
+    <div class="layui-form-item">
+      <div class="layui-input-wrap">
+        <div class="layui-input-prefix">
+          <i class="layui-icon layui-icon-username"></i>
+        </div>
+        <input type="text" name="username" value="" lay-verify="required" placeholder="用户名" autocomplete="off" class="layui-input" lay-affix="clear">
+      </div>
+    </div>
+    <div class="layui-form-item">
+      <input type="checkbox" name="agreement" lay-verify="required" lay-skin="primary" title="同意">
+      <a href="terms.html" target="_blank" style="position: relative; top: 6px; left: -15px;">
+        <ins>用户协议</ins>
+      </a>
+    </div>
+    <div class="layui-form-item">
+      <button class="layui-btn layui-btn-fluid" lay-submit lay-filter="demo-reg">注册</button>
+    </div>
+    <div class="layui-form-item demo-reg-other">
+      <label>社交账号注册</label>
+      <span style="padding: 0 21px 0 6px;">
+        <a href="javascript:;"><i class="layui-icon layui-icon-login-qq" style="color: #3492ed;"></i></a>
+        <a href="javascript:;"><i class="layui-icon layui-icon-login-wechat" style="color: #4daf29;"></i></a>
+        <a href="javascript:;"><i class="layui-icon layui-icon-login-weibo" style="color: #cf1900;"></i></a>
+      </span>
+      <button type="submit" name="login" class="layui-btn layui-btn-primary">登录帐号</button>
+    </div>
+  </div>
+</form>
+
+<!-- 请勿在项目正式环境中引用该 layui.js 地址 -->
+<script src="../static/layui.js"></script>
+<script>
+layui.use(function(){
+  var $ = layui.$;
+  var form = layui.form;
+  var layer = layui.layer;
+  var util = layui.util;
+
+  // 自定义验证规则
+  form.verify({
+    // 确认密码
+    confirmPassword: function(value, item){
+      var passwordValue = $('#reg-password').val();
+      if(value !== passwordValue){
+        return '两次密码输入不一致';
+      }
+    }
+  });
+
+  // 提交事件
+  form.on('submit(demo-reg)', function(data) {
+    var field = data.field; // 获取表单字段值
+
+    // 是否勾选同意
+    if (!field.agreement) {
+      layer.msg('您必须勾选同意用户协议才能注册');
+      return false;
+    }
+  });
+});
+</script>
+
+</body>
+</html>
