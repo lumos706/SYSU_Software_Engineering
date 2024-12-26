@@ -15,7 +15,7 @@ CREATE TABLE Drone (
     max_load_capacity DECIMAL(10, 2),
     location VARCHAR(255),
     battery_level DECIMAL(5, 2),
-    manufacture_date DATE,
+    manufacture_date VARCHAR(100),
     pilot_id INT,
     FOREIGN KEY (pilot_id) REFERENCES Pilot(pilot_id) ON UPDATE CASCADE
 );
@@ -24,7 +24,7 @@ CREATE TABLE Drone (
 CREATE TABLE DeliveryTask (
     task_id INT AUTO_INCREMENT PRIMARY KEY,
     drone_id INT,
-    start_time DATETIME,
+    start_time VARCHAR(100),
     completion_status VARCHAR(50),
     FOREIGN KEY (drone_id) REFERENCES Drone(drone_id) ON UPDATE CASCADE
 );
@@ -53,7 +53,7 @@ CREATE TABLE Package (
 CREATE TABLE DroneHistory (
     history_id INT AUTO_INCREMENT PRIMARY KEY,
     drone_id INT,
-    timestamp DATETIME,
+    timestamp VARCHAR(100),
     location VARCHAR(255),
     FOREIGN KEY (drone_id) REFERENCES Drone(drone_id) ON UPDATE CASCADE
 );
