@@ -78,7 +78,7 @@ def Login_admin():
         if username and password:
             admin = Admin.query.filter_by(login_credentials=username).first()
             if admin:
-                if check_password_hash(admin.password, password):
+                if password == admin.password:
                     login_user(admin)
                     session['user_type'] = 'admin'
                     return redirect(url_for('admin.dashboard'))
