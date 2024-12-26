@@ -26,10 +26,17 @@
           {{ admin.name }}
         </a>
         <dl class="layui-nav-child">
-          <dd><a href="javascript:;">Your Profile</a></dd>
-          <dd><a href="javascript:;">Settings</a></dd>
-<!--          转到auth.logout-->
-          <dd><a href="{{ url_for('auth.logout') }}">Sign out</a></dd>
+          <dd><a href="javascript:;" onclick="showMessage()">个人资料</a></dd>
+            <script>
+              function showMessage() {
+                layui.use('layer', function(){
+                  var layer = layui.layer;
+                  layer.msg('你是管理员{{ admin.name }}，ID为{{ admin.admin_id }}', {icon: 6});
+                });
+              }
+              </script>
+          <dd><a href="javascript:;" onclick="openEditLayer()">修改信息/密码</a></dd>
+          <dd><a href="{{ url_for('auth.logout') }}">登出</a></dd>
         </dl>
       </li>
       <li class="layui-nav-item" lay-header-event="menuRight" lay-unselect>
@@ -59,6 +66,18 @@
           <a href="javascript:;">无人机管理</a>
           <dl class="layui-nav-child">
             <dd><a href="{{ url_for('admin.manage_drone')}}">无人机列表</a></dd>
+          </dl>
+        </li>
+        <li class="layui-nav-item">
+          <a href="javascript:">包裹管理</a>
+          <dl class="layui-nav-child">
+            <dd><a href="{{ url_for('admin.manage_package')}}">包裹列表</a></dd>
+          </dl>
+        </li>
+        <li class="layui-nav-item">
+          <a href="javascript:">任务管理</a>
+          <dl class="layui-nav-child">
+            <dd><a href="{{ url_for('admin.manage_task')}}">任务列表</a></dd>
           </dl>
         </li>
       </ul>
@@ -115,6 +134,58 @@ layui.use(['element', 'layer', 'util'], function(){
     }
   });
 });
+</script>
+<script>
+function openEditLayer() {
+  layui.use('layer', function(){
+    var layer = layui.layer;
+    layer.open({
+      type: 1,
+      title: '修改信息/密码',
+      area: ['500px', '400px'],
+      content: `
+        <div class="layui-form" lay-filter="filter-test-layer" style="margin: 16px;">
+                          <form action="/admin/admin_modify" method="POST">
+                            <div class="demo-reg-container">
+                            <div class="layui-form-item">
+                                <div class="layui-input-wrap">
+                                  <div class="layui-input-prefix">
+                                    <i class="layui-icon layui-icon-username"></i>
+                                  </div>
+                                  <input type="text" name="login_credentials" value="" lay-verify="required" placeholder="登录凭证" autocomplete="off" class="layui-input" lay-affix="clear">
+                                </div>
+                              </div>
+                              <div class="layui-form-item">
+                                <div class="layui-input-wrap">
+                                  <div class="layui-input-prefix">
+                                    <i class="layui-icon layui-icon-password"></i>
+                                  </div>
+                                  <input type="text" name="password" value="" lay-verify="required" placeholder="密   码" lay-reqtext="请填写密码" autocomplete="off" class="layui-input" id="reg-password" lay-affix="eye">
+                                </div>
+                              </div>
+                              <div class="layui-form-item">
+                                <div class="layui-input-wrap">
+                                  <div class="layui-input-prefix">
+                                    <i class="layui-icon layui-icon-username"></i>
+                                  </div>
+                                  <input type="text" name="name" value="" lay-verify="required" placeholder="用户名" autocomplete="off" class="layui-input" lay-affix="clear">
+                                </div>
+                              </div>
+                              <div class="layui-form-item">
+                                <button class="layui-btn layui-btn-fluid" type="submit">确定</button>
+                              </div>
+                            </div>
+                          </form>
+                        </div>
+      `
+    });
+    form.on('submit(demo-reg)', function(data) {
+                      // 获取表单数据
+                      var formData = data.field;
+                      return false; // 阻止默认表单跳转行为
+                    });
+  });
+}
 </script>
 </body>
 </html>

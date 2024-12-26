@@ -2,5 +2,6 @@
 <project version="4">
   <component name="SqlDialectMappings">
     <file url="file://$PROJECT_DIR$/app/__init__.py" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/drone_system.sql" dialect="GenericSQL" />
   </component>
 </project>
