@@ -27,20 +27,21 @@ def Login_user():
             return redirect(url_for('auth.register'))
         username = request.form['username']
         password = request.form['password']
-        user = User.query.filter_by(username=username).first()
-        if user:
-            if check_password_hash(user.password, password):
-                login_user(user)
-                session['user_type'] = 'user'
-                return redirect(url_for('user.dashboard'))
+        if username and password:
+            user = User.query.filter_by(username=username).first()
+            if user:
+                if check_password_hash(user.password, password):
+                    login_user(user)
+                    session['user_type'] = 'user'
+                    return redirect(url_for('user.dashboard'))
+                else:
+                    return render_template('login.html', error_message='Invalid username or password')
             else:
-                flash('Invalid password')
-                return render_template('login.html')
+                return render_template('login.html', error_message='Username does not exist')
         else:
-            flash('Username does not exist')
-            return render_template('login.html')
+            return render_template('login.html', error_message="code error")
     if request.method == 'GET':
-        return render_template('login.html')
+        return render_template('login.html', error_message=None)
 
 
 @bp.route('/Login_pilot', methods=['GET', 'POST'])
@@ -50,15 +51,21 @@ def Login_pilot():
             return redirect(url_for('auth.register'))
         username = request.form['username']
         password = request.form['password']
-        pilot = Pilot.query.filter_by(login_credentials=username).first()
-        if pilot and check_password_hash(pilot.password, password):
-            login_user(pilot)
-            session['user_type'] = 'pilot'
-            return redirect(url_for('pilot.dashboard'))
+        if username and password:
+            pilot = Pilot.query.filter_by(login_credentials=username).first()
+            if pilot:
+                if check_password_hash(pilot.password, password):
+                    login_user(pilot)
+                    session['user_type'] = 'pilot'
+                    return redirect(url_for('pilot.dashboard'))
+                else:
+                    return render_template('login_admin_pilot.html', error_message='Invalid username or password')
+            else:
+                return render_template('login_admin_pilot.html', error_message='Username does not exist')
         else:
-            flash('Invalid username or password')
+            return render_template('login_admin_pilot.html', error_message='code error')
     if request.method == 'GET':
-        return render_template('login_admin_pilot.html')
+        return render_template('login_admin_pilot.html', error_message=None)
 
 
 @bp.route('/Login_admin', methods=['GET', 'POST'])
@@ -68,16 +75,21 @@ def Login_admin():
             return redirect(url_for('auth.register'))
         username = request.form['username']
         password = request.form['password']
-        admin = Admin.query.filter_by(login_credentials=username).first()
-        if admin and password == admin.password:
-            login_user(admin)
-            session['user_type'] = 'admin'
-            return redirect(url_for('admin.dashboard'))
+        if username and password:
+            admin = Admin.query.filter_by(login_credentials=username).first()
+            if admin:
+                if check_password_hash(admin.password, password):
+                    login_user(admin)
+                    session['user_type'] = 'admin'
+                    return redirect(url_for('admin.dashboard'))
+                else:
+                    return render_template('login_admin_pilot.html', error_message='Invalid username or password')
+            else:
+                return render_template('login_admin_pilot.html', error_message='Username does not exist')
         else:
-            flash('Invalid username or password')
-            return render_template('login_admin_pilot.html')
+            return render_template('login_admin_pilot.html', error_message='code error')
     if request.method == 'GET':
-        return render_template('login_admin_pilot.html')
+        return render_template('login_admin_pilot.html', error_message=None)
 
 
 @bp.route('/register', methods=['GET', 'POST'])

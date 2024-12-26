@@ -26,9 +26,17 @@
           {{ admin.name }}
         </a>
         <dl class="layui-nav-child">
-          <dd><a href="javascript:">Your Profile</a></dd>
-          <dd><a href="javascript:">Settings</a></dd>
-          <dd><a href="{{ url_for('auth.logout') }}">Sign out</a></dd>
+          <dd><a href="javascript:;" onclick="showMessage()">个人资料</a></dd>
+            <script>
+              function showMessage() {
+                layui.use('layer', function(){
+                  var layer = layui.layer;
+                  layer.msg('你是管理员{{ admin.name }}，ID为{{ admin.admin_id }}', {icon: 6});
+                });
+              }
+              </script>
+          <dd><a href="javascript:;" onclick="openEditLayer()">修改信息/密码</a></dd>
+          <dd><a href="{{ url_for('auth.logout') }}">登出</a></dd>
         </dl>
       </li>
       <li class="layui-nav-item" lay-header-event="menuRight" lay-unselect>
@@ -50,7 +58,7 @@
         <li class="layui-nav-item layui-nav-itemed">
           <a href="javascript:">操作员管理</a>
           <dl class="layui-nav-child">
-            <dd><a href="{{ url_for('admin.manage_drone')}}">操作员列表</a></dd>
+            <dd><a href="{{ url_for('admin.manage_pilot')}}">操作员列表</a></dd>
           </dl>
         </li>
         <li class="layui-nav-item layui-nav-itemed">
@@ -90,7 +98,7 @@
     </script>
     <script type="text/html" id="toolDemo">
       <div class="layui-clear-space">
-        <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+        <a class="layui-btn layui-btn-xs" lay-event="del">删除</a>
         <a class="layui-btn layui-btn-xs" lay-event="more">
           更多
           <i class="layui-icon layui-icon-down"></i>
@@ -107,10 +115,9 @@
 
         table.render({
           elem: '#test',
-          url: '/admin/api/users',
+          url: '/admin/api/packages',
+          height:630,
           toolbar: '#toolbarDemo',
-          page: true,
-          limit: 10,
           defaultToolbar: ['filter', 'exports', 'print', {
             title: '提示',
             layEvent: 'LAYTABLE_TIPS',
@@ -130,8 +137,11 @@
           cols: [[
             {type: 'checkbox', fixed: 'left'},
             {field: 'id', fixed: 'left', width: 80, title: 'ID', sort: true, totalRow: '合计：'},
-            {field: 'username', title:'用户名 <i class="layui-icon layui-icon-tips layui-font-14" lay-event="username-tips" title="该字段开启了编辑功能" style="margin-left: 5px;"></i>', fieldTitle: '用户名', hide: 0, width:150, expandedMode: 'tips', edit: 'text'},
-            {field: 'contact_info', title:'联系方式 <i class="layui-icon layui-icon-tips layui-font-14" lay-event="contact-tips" title="该字段开启了编辑功能" style="margin-left: 5px;"></i>', fieldTitle: '联系方式', hide: 0, width:150, expandedMode: 'tips', edit: 'text'},
+            {field: 'recipient_name', title:'收件人姓名 <i class="layui-icon layui-icon-tips layui-font-14" lay-event="username-tips" title="该字段开启了编辑功能" style="margin-left: 5px;"></i>', fieldTitle: '收件人姓名', hide: 0, width:150, expandedMode: 'tips', edit: 'text'},
+            {field: 'recipient_address', title:'收件人地址 <i class="layui-icon layui-icon-tips layui-font-14" lay-event="contact-tips" title="该字段开启了编辑功能" style="margin-left: 5px;"></i>', width: 150, hide: 0, edit: 'text'},
+            {field: 'package_info', title:'包裹信息 <i class="layui-icon layui-icon-tips layui-font-14" lay-event="contact-tips" title="该字段开启了编辑功能" style="margin-left: 5px;"></i>', width: 150, hide: 0, edit: 'text'},
+            {field: 'task_id', title:'任务ID <i class="layui-icon layui-icon-tips layui-font-14" lay-event="contact-tips" title="外键(Task), 该字段开启了编辑功能" style="margin-left: 5px;"></i>', width: 150, hide: 0, edit: 'text'},
+            {field: 'user_id', title:'用户ID <i class="layui-icon layui-icon-tips layui-font-14" lay-event="contact-tips" title="外键(User), 该字段开启了编辑功能" style="margin-left: 5px;"></i>', width: 150, hide: 0, edit: 'text'},
             {fixed: 'right', title:'操作', width: 134, minWidth: 125, templet: '#toolDemo'}
             // 其他字段
           ]],
@@ -142,7 +152,7 @@
             dropdown.render({
               elem: '#dropdownButton',
               data: [
-                { id: 'add', title: '添加新用户' },
+                { id: 'add', title: '添加新包裹' },
                 { id: 'del', title: '批量删除' },
                 { id: 'bulk add', title: '批量注册' }
 
@@ -158,37 +168,53 @@
                       area: '600px',
                       resize: false,
                       shadeClose: true,
-                      title: '添加新用户',
+                      title: '添加新包裹',
                       content: `
                         <div class="layui-form" lay-filter="filter-test-layer" style="margin: 16px;">
-                          <form action="/admin/add_user" method="POST">
+                          <form action="/admin/add_package" method="POST">
                             <div class="demo-reg-container">
                               <div class="layui-form-item">
                                 <div class="layui-input-wrap">
                                   <div class="layui-input-prefix">
-                                    <i class="layui-icon layui-icon-cellphone"></i>
+                                    <i class="layui-icon layui-icon-user"></i>
                                   </div>
-                                  <input type="text" name="contact_info" value="" lay-verify="required|phone" placeholder="手机号" lay-reqtext="请填写手机号" autocomplete="off" class="layui-input" id="reg-cellphone">
+                                  <input type="text" name="recipient_name" value="" lay-verify="required" placeholder="收件人姓名" lay-reqtext="请填写收件人姓名" autocomplete="off" class="layui-input">
                                 </div>
                               </div>
                               <div class="layui-form-item">
                                 <div class="layui-input-wrap">
                                   <div class="layui-input-prefix">
-                                    <i class="layui-icon layui-icon-password"></i>
+                                    <i class="layui-icon layui-icon-location"></i>
                                   </div>
-                                  <input type="text" name="password" value="" lay-verify="required" placeholder="密   码" lay-reqtext="请填写密码" autocomplete="off" class="layui-input" id="reg-password" lay-affix="eye">
+                                  <input type="text" name="recipient_address" value="" lay-verify="required" placeholder="收件人地址" lay-reqtext="请填写收件人地址" autocomplete="off" class="layui-input">
                                 </div>
                               </div>
                               <div class="layui-form-item">
                                 <div class="layui-input-wrap">
                                   <div class="layui-input-prefix">
-                                    <i class="layui-icon layui-icon-username"></i>
+                                    <i class="layui-icon layui-icon-about"></i>
                                   </div>
-                                  <input type="text" name="username" value="" lay-verify="required" placeholder="用户名" autocomplete="off" class="layui-input" lay-affix="clear">
+                                  <input type="text" name="package_info" value="" lay-verify="required" placeholder="包裹信息" lay-reqtext="请填写包裹信息" autocomplete="off" class="layui-input" lay-affix="clear">
                                 </div>
                               </div>
                               <div class="layui-form-item">
-                                <button class="layui-btn layui-btn-fluid" type="submit">注册</button>
+                                <div class="layui-input-wrap">
+                                  <div class="layui-input-prefix">
+                                    <i class="layui-icon layui-icon-about"></i>
+                                  </div>
+                                  <input type="text" name="task_id" value="" lay-verify="required" placeholder="任务ID" lay-reqtext="请填写任务ID" autocomplete="off" class="layui-input" lay-affix="clear">
+                                </div>
+                              </div>
+                              <div class="layui-form-item">
+                                <div class="layui-input-wrap">
+                                  <div class="layui-input-prefix">
+                                    <i class="layui-icon layui-icon-about"></i>
+                                  </div>
+                                  <input type="text" name="user_id" value="" lay-verify="required" placeholder="用户ID" lay-reqtext="请填写用户ID" autocomplete="off" class="layui-input" lay-affix="clear">
+                                </div>
+                              </div>
+                              <div class="layui-form-item">
+                                <button class="layui-btn layui-btn-fluid" type="submit">确定</button>
                               </div>
                             </div>
                           </form>
@@ -212,13 +238,13 @@
                           return item.id;
                           });
                           //重定向到delete_user路由
-                          window.location.href = '/admin/bulk_delete_user/' + ids.join(',');
+                          window.location.href = '/admin/bulk_delete_package/' + ids.join(',');
                           layer.close(index);
                       });
                     }
                   break;
                     case 'bulk add':
-                      window.location.href = '/admin/bulk_register';
+                      window.location.href = '/admin/bulk_register_package';
                         break;
                 }
               }
@@ -252,29 +278,29 @@
 
         table.on('tool(test)', function(obj){
           var data = obj.data;
-          if(obj.event === 'edit'){
-            layer.open({
-              title: '编辑 - id:'+ data.id,
-              type: 1,
-              area: ['80%','80%'],
-              content: '<div style="padding: 16px;">自定义表单元素</div>'
-            });
+          if(obj.event === 'del'){
+            layer.confirm('真的删除行 [id: '+ data.id +'] 么', function(index){
+                    obj.del();
+                    //重定向到delete_user路由
+                    window.location.href = '/admin/delete_package/' + data.id;
+                    layer.close(index);
+                  });
           } else if(obj.event === 'more'){
             dropdown.render({
               elem: this,
               show: true,
               data: [{
-                title: '删除',
-                id: 'del'
+                title: '编辑',
+                id: 'edit'
               }],
               click: function(menudata){
-                if(menudata.id === 'del'){
-                  layer.confirm('真的删除行 [id: '+ data.id +'] 么', function(index){
-                    obj.del();
-                    //重定向到delete_user路由
-                    window.location.href = '/admin/delete_user/' + data.id;
-                    layer.close(index);
-                  });
+                if(menudata.id === 'edit'){
+                  layer.open({
+                  title: '编辑 - id:'+ data.id,
+                  type: 1,
+                  area: ['80%','80%'],
+                  content: '<div style="padding: 16px;">自定义表单元素</div>'
+                });
                 }
               },
               id: 'dropdown-table-tool',
@@ -304,16 +330,48 @@
           console.log(obj);
         });
 
-        table.on('edit(test)', function(obj){
-          var field = obj.field;
-          var value = obj.value;
-          var data = obj.data;
-          layer.msg('编辑成功', {icon: 1});
+        table.on('edit(test)', function(obj) {
+    var field = obj.field; // 被编辑的字段
+    var value = obj.value; // 编辑后的值
+    var data = obj.data;   // 当前整行数据
 
-          var update = {};
-          update[field] = value;
-          obj.update(update);
-          });
+    // 显示编辑成功提示
+    layer.msg('编辑成功，正在同步数据库...', {icon: 1});
+
+    // 使用表单格式提交数据
+    var formData = new FormData();
+    formData.append('id', data.id);        // 用户 ID
+    formData.append('field', field);      // 被编辑的字段
+    formData.append('value', value);      // 编辑后的值
+
+    // 发送 AJAX 请求到后端
+    fetch('/admin/update_package', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(res => {
+        if (res.success) {
+            layer.msg('数据库同步成功', {icon: 1});
+            // 更新当前行显示（可选）
+            var update = {};
+            update[field] = value;
+            obj.update(update);
+            // 重定向到当前页面，刷新数据
+            window.location.href = '/admin/manage_package';
+        } else {
+            layer.msg('数据库同步失败：' + res.message, {icon: 2});
+        }
+    })
+    .catch(error => {
+        layer.msg('请求失败，请稍后重试', {icon: 2});
+        console.error('错误信息:', error);
+    });
+
+
+});
+
+
           }
         });
       });
@@ -350,6 +408,58 @@ layui.use(['element', 'layer', 'util'], function(){
     }
   });
 });
+</script>
+<script>
+function openEditLayer() {
+  layui.use('layer', function(){
+    var layer = layui.layer;
+    layer.open({
+      type: 1,
+      title: '修改信息/密码',
+      area: ['500px', '400px'],
+      content: `
+        <div class="layui-form" lay-filter="filter-test-layer" style="margin: 16px;">
+                          <form action="/admin/admin_modify" method="POST">
+                            <div class="demo-reg-container">
+                            <div class="layui-form-item">
+                                <div class="layui-input-wrap">
+                                  <div class="layui-input-prefix">
+                                    <i class="layui-icon layui-icon-username"></i>
+                                  </div>
+                                  <input type="text" name="login_credentials" value="" lay-verify="required" placeholder="登录凭证" autocomplete="off" class="layui-input" lay-affix="clear">
+                                </div>
+                              </div>
+                              <div class="layui-form-item">
+                                <div class="layui-input-wrap">
+                                  <div class="layui-input-prefix">
+                                    <i class="layui-icon layui-icon-password"></i>
+                                  </div>
+                                  <input type="text" name="password" value="" lay-verify="required" placeholder="密   码" lay-reqtext="请填写密码" autocomplete="off" class="layui-input" id="reg-password" lay-affix="eye">
+                                </div>
+                              </div>
+                              <div class="layui-form-item">
+                                <div class="layui-input-wrap">
+                                  <div class="layui-input-prefix">
+                                    <i class="layui-icon layui-icon-username"></i>
+                                  </div>
+                                  <input type="text" name="name" value="" lay-verify="required" placeholder="用户名" autocomplete="off" class="layui-input" lay-affix="clear">
+                                </div>
+                              </div>
+                              <div class="layui-form-item">
+                                <button class="layui-btn layui-btn-fluid" type="submit">确定</button>
+                              </div>
+                            </div>
+                          </form>
+                        </div>
+      `
+    });
+    form.on('submit(demo-reg)', function(data) {
+                      // 获取表单数据
+                      var formData = data.field;
+                      return false; // 阻止默认表单跳转行为
+                    });
+  });
+}
 </script>
 </body>
 </html>

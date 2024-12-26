@@ -58,7 +58,7 @@
         <li class="layui-nav-item layui-nav-itemed">
           <a href="javascript:">操作员管理</a>
           <dl class="layui-nav-child">
-            <dd><a href="{{ url_for('admin.manage_drone')}}">操作员列表</a></dd>
+            <dd><a href="{{ url_for('admin.manage_pilot')}}">操作员列表</a></dd>
           </dl>
         </li>
         <li class="layui-nav-item layui-nav-itemed">
@@ -226,7 +226,7 @@
                     }
                   break;
                     case 'bulk add':
-                      window.location.href = '/admin/bulk_register';
+                      window.location.href = '/admin/bulk_register_user';
                         break;
                 }
               }

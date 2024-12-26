@@ -7,15 +7,6 @@
   <link href="../static/css/layui.css" rel="stylesheet">
 </head>
 <body>
-<!--  {% with messages = get_flashed_messages() %}-->
-<!--    {% if messages %}-->
-<!--      <ul class="flashes">-->
-<!--        {% for message in messages %}-->
-<!--          <li>{{ message }}</li>-->
-<!--        {% endfor %}-->
-<!--      </ul>-->
-<!--    {% endif %}-->
-<!--  {% endwith %}-->
 <style>
 .demo-login-container{width: 320px; margin: 200px auto 0;}
 .demo-login-title{font-size: 20px; color: #333; text-align: center; margin-bottom: 20px;}
@@ -78,6 +69,14 @@
 
 <!-- 请勿在项目正式环境中引用该 layui.js 地址 -->
 <script src="../static/layui.js"></script>
+{% if error_message and error_message!='code_error' %}
+<script>
+layui.use('layer', function(){
+  var layer = layui.layer;
+  layer.msg('{{ error_message }}', {icon: 5},{time: 100});
+});
+</script>
+{% endif %}
 
 </body>
 </html>

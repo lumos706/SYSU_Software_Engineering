@@ -68,6 +68,13 @@
 
 <!-- 请勿在项目正式环境中引用该 layui.js 地址 -->
 <script src="../static/layui.js"></script>
-
+{% if error_message and error_message!='code_error' %}
+<script>
+layui.use('layer', function(){
+  var layer = layui.layer;
+  layer.msg('{{ error_message }}', {icon: 5},{time: 100});
+});
+</script>
+{% endif %}
 </body>
 </html>

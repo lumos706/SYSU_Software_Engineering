@@ -45,24 +45,43 @@ class Drone(db.Model):
     max_load_capacity = db.Column(db.Float)
     location = db.Column(db.String(255))
     battery_level = db.Column(db.Float)
+    manufacture_date = db.Column(db.String(100))
+    pilot_id = db.Column(db.Integer, db.ForeignKey('pilot.pilot_id'))
+
+    def __repr__(self):
+        return f"<Drone {self.drone_id}>"
+
+    def get_id(self):
+        return self.drone_id
 
 class DeliveryTask(db.Model):
     task_id = db.Column(db.Integer, primary_key=True)
-    drone_id = db.Column(db.Integer, db.ForeignKey('drone.id'))
-    start_time = db.Column(db.DateTime)
+    drone_id = db.Column(db.Integer, db.ForeignKey('drone.drone_id'))
+    start_time = db.Column(db.String(100))
     completion_status = db.Column(db.String(50))
 
+    def __repr__(self):
+        return f"<DeliveryTask {self.task_id}>"
+
+    def get_id(self):
+        return self.task_id
 
 class Package(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
+    package_id = db.Column(db.Integer, primary_key=True)
     recipient_name = db.Column(db.String(100), nullable=False)
     recipient_address = db.Column(db.String(255), nullable=False)
-    weight = db.Column(db.Float, nullable=False)
-    delivery_task_id = db.Column(db.Integer, db.ForeignKey('delivery_task.id'))
+    package_info = db.Column(db.Text, nullable=False)
+    task_id = db.Column(db.Integer, db.ForeignKey('delivery_task.task_id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.user_id'))
 
+    def __repr__(self):
+        return f"<Package {self.package_id}>"
+
+    def get_id(self):
+        return self.package_id
 
 class DroneHistory(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     drone_id = db.Column(db.Integer, db.ForeignKey('drone.id'))
-    timestamp = db.Column(db.DateTime, nullable=False)
+    timestamp = db.Column(db.String(100), nullable=False)
     status = db.Column(db.String(255))

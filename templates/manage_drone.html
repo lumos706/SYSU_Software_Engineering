@@ -7,11 +7,18 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link href="../static/css/layui.css" rel="stylesheet">
+  <style>
+    .white-text {
+      color: white;
+    }
+  </style>
 </head>
 <body>
 <div class="layui-layout layui-layout-admin">
-  <div class="layui-header">
-    <div class="layui-logo layui-hide-xs layui-bg-green">管理员界面</div>
+  <div class="layui-header" >
+    <div class="layui-logo layui-hide-xs layui-bg-green">
+      <dd><a href="{{ url_for('admin.dashboard') }}" class="white-text">无人机物流管理系统</a></dd>
+    </div>
     <ul class="layui-nav layui-layout-right">
       <li class="layui-nav-item layui-hide layui-show-sm-inline-block">
         <a href="javascript:;">
@@ -19,9 +26,17 @@
           {{ admin.name }}
         </a>
         <dl class="layui-nav-child">
-          <dd><a href="javascript:;">Your Profile</a></dd>
-          <dd><a href="javascript:;">Settings</a></dd>
-          <dd><a href="{{ url_for('auth.logout') }}">Sign out</a></dd>
+          <dd><a href="javascript:;" onclick="showMessage()">个人资料</a></dd>
+            <script>
+              function showMessage() {
+                layui.use('layer', function(){
+                  var layer = layui.layer;
+                  layer.msg('你是管理员{{ admin.name }}，ID为{{ admin.admin_id }}', {icon: 6});
+                });
+              }
+              </script>
+          <dd><a href="javascript:;" onclick="openEditLayer()">修改信息/密码</a></dd>
+          <dd><a href="{{ url_for('auth.logout') }}">登出</a></dd>
         </dl>
       </li>
       <li class="layui-nav-item" lay-header-event="menuRight" lay-unselect>
@@ -35,21 +50,33 @@
     <div class="layui-side-scroll">
       <ul class="layui-nav layui-nav-tree" lay-filter="test">
         <li class="layui-nav-item layui-nav-itemed">
-          <a class="" href="javascript:;">用户管理</a>
+          <a href="javascript:">用户管理</a>
           <dl class="layui-nav-child">
             <dd><a href="{{ url_for('admin.manage_user') }}">用户列表</a></dd>
           </dl>
         </li>
         <li class="layui-nav-item layui-nav-itemed">
-          <a href="javascript:;">操作员管理</a>
+          <a href="javascript:">操作员管理</a>
           <dl class="layui-nav-child">
-            <dd><a href="{{ url_for('admin.manage_drone')}}">操作员列表</a></dd>
+            <dd><a href="{{ url_for('admin.manage_pilot')}}">操作员列表</a></dd>
           </dl>
         </li>
         <li class="layui-nav-item layui-nav-itemed">
-          <a href="javascript:;">无人机管理</a>
+          <a href="javascript:">无人机管理</a>
           <dl class="layui-nav-child">
             <dd><a href="{{ url_for('admin.manage_drone')}}">无人机列表</a></dd>
+          </dl>
+        </li>
+        <li class="layui-nav-item layui-nav-itemed">
+          <a href="javascript:">包裹管理</a>
+          <dl class="layui-nav-child">
+            <dd><a href="{{ url_for('admin.manage_package')}}">包裹列表</a></dd>
+          </dl>
+        </li>
+        <li class="layui-nav-item layui-nav-itemed">
+          <a href="javascript:">任务管理</a>
+          <dl class="layui-nav-child">
+            <dd><a href="{{ url_for('admin.manage_task')}}">任务列表</a></dd>
           </dl>
         </li>
       </ul>
@@ -64,14 +91,14 @@
         <button class="layui-btn layui-btn-sm" lay-event="getCheckData">获取选中行数据</button>
         <button class="layui-btn layui-btn-sm" lay-event="getData">获取当前页数据</button>
         <button class="layui-btn layui-btn-sm" id="dropdownButton">
-          下拉按钮
+          更多操作...
           <i class="layui-icon layui-icon-down layui-font-12"></i>
         </button>
       </div>
     </script>
     <script type="text/html" id="toolDemo">
       <div class="layui-clear-space">
-        <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+        <a class="layui-btn layui-btn-xs" lay-event="del">删除</a>
         <a class="layui-btn layui-btn-xs" lay-event="more">
           更多
           <i class="layui-icon layui-icon-down"></i>
@@ -89,13 +116,14 @@
         table.render({
           elem: '#test',
           url: '/admin/api/drones',
+          height:630,
           toolbar: '#toolbarDemo',
           defaultToolbar: ['filter', 'exports', 'print', {
             title: '提示',
             layEvent: 'LAYTABLE_TIPS',
             icon: 'layui-icon-tips',
             onClick: function(obj) {
-                layer.alert('自定义工具栏图标按钮');
+                layer.alert('这里是自定义工具栏');
             }
           }],
           parseData: function(res){
@@ -106,54 +134,136 @@
               "data": res.data.item
             };
           },
-          height: 'full-35',
-          cellMinWidth: 240,
-          totalRow: true,
           cols: [[
             {type: 'checkbox', fixed: 'left'},
-            {field: 'id', fixed: 'left', width: 80, title: 'ID', sort: true, totalRow: '合计：'},
-            {field: 'username', title:'用户名 <i class="layui-icon layui-icon-tips layui-font-14" lay-event="username-tips" title="该字段开启了编辑功能" style="margin-left: 5px;"></i>', fieldTitle: '用户名', hide: 0, width:150, expandedMode: 'tips', edit: 'text'},
-            {field: 'contact_info', title:'联系方式 <i class="layui-icon layui-icon-tips layui-font-14" lay-event="contact-tips" title="该字段开启了编辑功能" style="margin-left: 5px;"></i>', fieldTitle: '联系方式', hide: 0, width:150, expandedMode: 'tips', edit: 'text'},
+            {field: 'id', fixed: 'left', width: 80, title: 'ID', sort: true},
+            {field: 'model', title:'型号 <i class="layui-icon layui-icon-tips layui-font-14" lay-event="username-tips" title="该字段开启了编辑功能" style="margin-left: 5px;"></i>', fieldTitle: '型号', hide: 0, width:120, expandedMode: 'tips', edit: 'text'},
+            {field: 'status', title:'状态 <i class="layui-icon layui-icon-tips layui-font-14" lay-event="contact-tips" title="该字段开启了编辑功能" style="margin-left: 5px;"></i>', fieldTitle: '状态', hide: 0, width:120, expandedMode: 'tips', edit: 'text'},
+            {field: 'max_load_capacity', title:'最大载荷(KG) <i class="layui-icon layui-icon-tips layui-font-14" lay-event="contact-tips" title="该字段开启了编辑功能" style="margin-left: 5px;"></i>', width: 120, hide: 0, edit: 'text'},
+            {field: 'location', title:'位置 <i class="layui-icon layui-icon-tips layui-font-14" lay-event="contact-tips" title="该字段开启了编辑功能" style="margin-left: 5px;"></i>', width: 120, hide: 0, edit: 'text'},
+            {field: 'battery_level', title:'电量(%) <i class="layui-icon layui-icon-tips layui-font-14" lay-event="contact-tips" title="该字段开启了编辑功能" style="margin-left: 5px;"></i>', width: 120, hide: 0, edit: 'text'},
+            {field: 'manufacture_date', title:'生产时间 <i class="layui-icon layui-icon-tips layui-font-14" lay-event="contact-tips" title="该字段开启了编辑功能" style="margin-left: 5px;"></i>', width: 120, hide: 0, edit: 'text'},
+            {field: 'pilot_id', title:'操作员ID <i class="layui-icon layui-icon-tips layui-font-14" lay-event="contact-tips" title="外键(Pilot), 该字段开启了编辑功能" style="margin-left: 5px;"></i>', width: 120, hide: 0, edit: 'text'},
             {fixed: 'right', title:'操作', width: 134, minWidth: 125, templet: '#toolDemo'}
             // 其他字段
           ]],
           page: true,
+          limit:[10, 20, 30, 40, 50],
           done: function(){
             var id = this.id;
             dropdown.render({
               elem: '#dropdownButton',
               data: [
-                { id: 'add', title: '添加' },
-                { id: 'update', title: '编辑' },
-                { id: 'delete', title: '删除' }
+                { id: 'add', title: '添加新...' },
+                { id: 'del', title: '批量删除' },
+                { id: 'bulk add', title: '批量注册' }
+
               ],
               click: function(obj){
                 var checkStatus = table.checkStatus(id);
                 var data = checkStatus.data;
                 switch(obj.id){
                   case 'add':
+                    layui.use(['layer', 'form'], function() {
                     layer.open({
-                      title: '添加',
                       type: 1,
-                      area: ['80%','80%'],
-                      content: '<div style="padding: 16px;">自定义表单元素</div>'
+                      area: '600px',
+                      resize: false,
+                      shadeClose: true,
+                      title: '添加新...',
+                      content: `
+                        <div class="layui-form" lay-filter="filter-test-layer" style="margin: 16px;">
+                          <form action="/admin/add_drone" method="POST">
+                            <div class="demo-reg-container">
+                              <div class="layui-form-item">
+                                <div class="layui-input-wrap">
+                                  <div class="layui-input-prefix">
+                                    <i class="layui-icon layui-icon-template-1"></i>
+                                  </div>
+                                  <input type="text" name="model" value="" lay-verify="" placeholder="型号" lay-reqtext="请填写" autocomplete="off" class="layui-input">
+                                </div>
+                              </div>
+                              <div class="layui-form-item">
+                                <div class="layui-input-wrap">
+                                  <div class="layui-input-prefix">
+                                    <i class="layui-icon layui-icon-help"></i>
+                                  </div>
+                                  <input type="text" name="status" value="" lay-verify="" placeholder="状态" lay-reqtext="请填写" autocomplete="off" class="layui-input">
+                                </div>
+                              </div>
+                              <div class="layui-form-item">
+                                <div class="layui-input-wrap">
+                                  <div class="layui-input-prefix">
+                                    <i class="layui-icon layui-icon-console"></i>
+                                  </div>
+                                  <input type="number" lay-precision="2" name="max_load_capacity" value="" lay-verify="" placeholder="最大载荷(KG)" lay-reqtext="请填写" autocomplete="off" class="layui-input">
+                                </div>
+                              </div>
+                              <div class="layui-form-item">
+                                <div class="layui-input-wrap">
+                                  <div class="layui-input-prefix">
+                                    <i class="layui-icon layui-icon-location"></i>
+                                  </div>
+                                  <input type="text" name="location" value="" lay-verify="" placeholder="位   置" lay-reqtext="请填写" autocomplete="off" class="layui-input">
+                                </div>
+                              </div>
+                              <div class="layui-form-item">
+                                <div class="layui-input-wrap">
+                                  <div class="layui-input-prefix">
+                                    <i class="layui-icon layui-icon-fire"></i>
+                                  </div>
+                                  <input type="number" lay-precision="2" name="battery_level" value="" lay-verify="" placeholder="电量(%)" autocomplete="off" class="layui-input" lay-affix="clear">
+                                </div>
+                              </div>
+                              <div class="layui-form-item">
+                                <div class="layui-input-wrap">
+                                  <div class="layui-input-prefix">
+                                    <i class="layui-icon layui-icon-date"></i>
+                                  </div>
+                                  <input type="text" name="manufacture_date" value="" lay-verify="" placeholder="生产日期" lay-reqtext="请填写" autocomplete="off" class="layui-input">
+                                </div>
+                              </div>
+                              <div class="layui-form-item">
+                                <div class="layui-input-wrap">
+                                  <div class="layui-input-prefix">
+                                    <i class="layui-icon layui-icon-user"></i>
+                                  </div>
+                                  <input type="text" name="pilot_id" value="" lay-verify="" placeholder="操作员id" lay-reqtext="请填写" autocomplete="off" class="layui-input">
+                                </div>
+                              </div>
+                              <div class="layui-form-item">
+                                <button class="layui-btn layui-btn-fluid" type="submit">注册</button>
+                              </div>
+                            </div>
+                          </form>
+                        </div>
+                      `
                     });
-                    break;
-                  case 'update':
-                    if(data.length !== 1) return layer.msg('请选择一行');
-                    layer.open({
-                      title: '编辑',
-                      type: 1,
-                      area: ['80%','80%'],
-                      content: '<div style="padding: 16px;">自定义表单元素</div>'
+                    // 监听表单提交
+                    form.on('submit(demo-reg)', function(data) {
+                      // 获取表单数据
+                      var formData = data.field;
+                      return false; // 阻止默认表单跳转行为
                     });
-                    break;
-                  case 'delete':
-                    if(data.length === 0){
-                      return layer.msg('请选择一行');
+                  });
+                  break;
+                    case 'del':
+                      if(data.length === 0){
+                      layer.msg('请先选择要删除的用户', {icon: 0});
+                      } else {
+                      layer.confirm('真的删除选中的用户么', function(index){
+                          var ids = data.map(function(item){
+                          return item.id;
+                          });
+                          //重定向到delete_user路由
+                          window.location.href = '/admin/bulk_delete_drone/' + ids.join(',');
+                          layer.close(index);
+                      });
                     }
-                    layer.msg('delete event');
-                    break;
+                  break;
+                    case 'bulk add':
+                      window.location.href = '/admin/bulk_register_drone';
+                        break;
                 }
               }
             });
@@ -186,32 +296,29 @@
 
         table.on('tool(test)', function(obj){
           var data = obj.data;
-          if(obj.event === 'edit'){
-            layer.open({
-              title: '编辑 - id:'+ data.id,
-              type: 1,
-              area: ['80%','80%'],
-              content: '<div style="padding: 16px;">自定义表单元素</div>'
-            });
+          if(obj.event === 'del'){
+            layer.confirm('真的删除行 [id: '+ data.id +'] 么', function(index){
+                    obj.del();
+                    //重定向到delete_user路由
+                    window.location.href = '/admin/delete_drone/' + data.id;
+                    layer.close(index);
+                  });
           } else if(obj.event === 'more'){
             dropdown.render({
               elem: this,
               show: true,
               data: [{
-                title: '查看',
-                id: 'detail'
-              },{
-                title: '删除',
-                id: 'del'
+                title: '编辑',
+                id: 'edit'
               }],
               click: function(menudata){
-                if(menudata.id === 'detail'){
-                  layer.msg('查看操作，当前行 ID:'+ data.id);
-                } else if(menudata.id === 'del'){
-                  layer.confirm('真的删除行 [id: '+ data.id +'] 么', function(index){
-                    obj.del();
-                    layer.close(index);
-                  });
+                if(menudata.id === 'edit'){
+                  layer.open({
+                  title: '编辑 - id:'+ data.id,
+                  type: 1,
+                  area: ['80%','80%'],
+                  content: '<div style="padding: 16px;">自定义表单元素</div>'
+                });
                 }
               },
               id: 'dropdown-table-tool',
@@ -241,16 +348,48 @@
           console.log(obj);
         });
 
-        table.on('edit(test)', function(obj){
-          var field = obj.field;
-          var value = obj.value;
-          var data = obj.data;
-          layer.msg('编辑成功', {icon: 1});
+        table.on('edit(test)', function(obj) {
+    var field = obj.field; // 被编辑的字段
+    var value = obj.value; // 编辑后的值
+    var data = obj.data;   // 当前整行数据
 
-          var update = {};
-          update[field] = value;
-          obj.update(update);
-          });
+    // 显示编辑成功提示
+    layer.msg('编辑成功，正在同步数据库...', {icon: 1});
+
+    // 使用表单格式提交数据
+    var formData = new FormData();
+    formData.append('id', data.id);        // 用户 ID
+    formData.append('field', field);      // 被编辑的字段
+    formData.append('value', value);      // 编辑后的值
+
+    // 发送 AJAX 请求到后端
+    fetch('/admin/update_drone', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(res => {
+        if (res.success) {
+            layer.msg('数据库同步成功', {icon: 1});
+            // 更新当前行显示（可选）
+            var update = {};
+            update[field] = value;
+            obj.update(update);
+            // 重定向到当前页面，刷新数据
+            window.location.href = '/admin/manage_drone';
+        } else {
+            layer.msg('数据库同步失败：' + res.message, {icon: 2});
+        }
+    })
+    .catch(error => {
+        layer.msg('请求失败，请稍后重试', {icon: 2});
+        console.error('错误信息:', error);
+    });
+
+
+});
+
+
           }
         });
       });
@@ -287,6 +426,58 @@ layui.use(['element', 'layer', 'util'], function(){
     }
   });
 });
+</script>
+<script>
+function openEditLayer() {
+  layui.use('layer', function(){
+    var layer = layui.layer;
+    layer.open({
+      type: 1,
+      title: '修改信息/密码',
+      area: ['500px', '400px'],
+      content: `
+        <div class="layui-form" lay-filter="filter-test-layer" style="margin: 16px;">
+                          <form action="/admin/admin_modify" method="POST">
+                            <div class="demo-reg-container">
+                            <div class="layui-form-item">
+                                <div class="layui-input-wrap">
+                                  <div class="layui-input-prefix">
+                                    <i class="layui-icon layui-icon-username"></i>
+                                  </div>
+                                  <input type="text" name="login_credentials" value="" lay-verify="required" placeholder="登录凭证" autocomplete="off" class="layui-input" lay-affix="clear">
+                                </div>
+                              </div>
+                              <div class="layui-form-item">
+                                <div class="layui-input-wrap">
+                                  <div class="layui-input-prefix">
+                                    <i class="layui-icon layui-icon-password"></i>
+                                  </div>
+                                  <input type="text" name="password" value="" lay-verify="required" placeholder="密   码" lay-reqtext="请填写密码" autocomplete="off" class="layui-input" id="reg-password" lay-affix="eye">
+                                </div>
+                              </div>
+                              <div class="layui-form-item">
+                                <div class="layui-input-wrap">
+                                  <div class="layui-input-prefix">
+                                    <i class="layui-icon layui-icon-username"></i>
+                                  </div>
+                                  <input type="text" name="name" value="" lay-verify="required" placeholder="用户名" autocomplete="off" class="layui-input" lay-affix="clear">
+                                </div>
+                              </div>
+                              <div class="layui-form-item">
+                                <button class="layui-btn layui-btn-fluid" type="submit">确定</button>
+                              </div>
+                            </div>
+                          </form>
+                        </div>
+      `
+    });
+    form.on('submit(demo-reg)', function(data) {
+                      // 获取表单数据
+                      var formData = data.field;
+                      return false; // 阻止默认表单跳转行为
+                    });
+  });
+}
 </script>
 </body>
 </html>
