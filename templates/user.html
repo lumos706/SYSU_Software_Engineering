@@ -75,19 +75,36 @@
             <td>{{ package.recipient_name }}</td>
             <td>{{ package.recipient_address }}</td>
             <td>
-              <button class="layui-btn layui-btn-normal" onclick="viewPackageStatus({{ package.package_id }})">更多信息</button>
+              <!-- noinspection PyUnresolvedReferences -->
+              <button class="layui-btn layui-btn-normal" onclick="viewPackageStatus( {{package.package_id}} )">更多信息</button>
             </td>
           </tr>
           {% endfor %}
         </tbody>
       </table>
-
-
-
-  <!-- Footer -->
+  </div>
 </div>
 
 <script>
+layui.use(['form', 'table', 'layer'], function(){
+  var form = layui.form;
+  var table = layui.table;
+  var layer = layui.layer;
+
+  form.on('submit(demo-table-search)', function(data){
+    var field = data.field; // 获得表单字段
+    // 执行搜索重载
+    table.reload('test', {
+      page: {
+        curr: 1 // 重新从第 1 页开始
+      },
+      where: field // 搜索的字段
+    });
+    layer.msg('搜索成功', {icon: 1});
+    return false; // 阻止默认 form 跳转
+  });
+});
+
 // Add Package
 function openAddPackage() {
   layui.use('layer', function() {
@@ -123,7 +140,9 @@ function openAddPackage() {
     });
   });
 }
+
 function viewPackageStatus(packageId) {
+  console.log('Fetching package status for ID:', packageId);
   fetch(`/user/package/status/${packageId}`)
     .then(response => response.json())
     .then(data => {
@@ -146,9 +165,12 @@ function viewPackageStatus(packageId) {
     })
     .catch(error => {
       console.error('Error fetching package status:', error);
+      layui.use('layer', function() {
+        var layer = layui.layer;
+        layer.msg('加载包裹状态失败，请稍后重试！', { icon: 2 });
+      });
     });
 }
-
 
 function openEditProfile() {
   layui.use('layer', function() {
@@ -224,7 +246,7 @@ function showProfile() {
       });
   });
 }
-
 </script>
+
 </body>
 </html>
