@@ -15,10 +15,13 @@
 </head>
 <body>
 <div class="layui-layout layui-layout-admin">
-  <div class="layui-header" >
+  <div class="layui-header layui-bg-cyan" >
     <div class="layui-logo layui-hide-xs layui-bg-green">
-      <dd><a href="{{ url_for('admin.dashboard') }}" class="white-text">无人机物流管理系统</a></dd>
+      <dd><a href="{{ url_for('admin.dashboard') }}" class="white-text layui-font-18">无人机物流管理系统</a></dd>
     </div>
+    <ul class="layui-nav layui-layout-left ">
+      <li class="layui-nav-item layui-hide-xs"><a href="{{ url_for('admin.manage_task') }}" class="white-text layui-font-16">任务管理</a></li>
+    </ul>
     <ul class="layui-nav layui-layout-right">
       <li class="layui-nav-item layui-hide layui-show-sm-inline-block">
         <a href="javascript:;">
@@ -46,9 +49,9 @@
       </li>
     </ul>
   </div>
-  <div class="layui-side layui-bg-black">
+  <div class="layui-side layui-bg-cyan">
     <div class="layui-side-scroll">
-      <ul class="layui-nav layui-nav-tree" lay-filter="test">
+      <ul class="layui-nav layui-nav-tree layui-bg-cyan" lay-filter="test">
         <li class="layui-nav-item layui-nav-itemed">
           <a href="javascript:">用户管理</a>
           <dl class="layui-nav-child">
@@ -84,6 +87,52 @@
   </div>
   <div class="layui-body">
     <div style="padding: 16px;">
+      <form class="layui-form layui-row layui-col-space16">
+   <div class="layui-col-md3">
+    <div class="layui-input-wrap">
+      <div class="layui-input-prefix">
+        <i class="layui-icon layui-icon-about"></i>
+      </div>
+      <input type="text" name="id" value="" placeholder="ID" class="layui-input" lay-affix="clear">
+    </div>
+  </div>
+  <div class="layui-col-md3">
+    <div class="layui-input-wrap">
+      <div class="layui-input-prefix">
+        <i class="layui-icon layui-icon-about"></i>
+      </div>
+      <input type="text" name="drone_id" value="" placeholder="无人机ID" class="layui-input" lay-affix="clear">
+    </div>
+  </div>
+  <div class="layui-col-md3">
+    <div class="layui-input-wrap">
+      <div class="layui-input-prefix">
+        <i class="layui-icon layui-icon-time"></i>
+      </div>
+      <input type="text" name="start_time" readonly placeholder="开始时间" class="layui-input demo-table-search-datetime-1">
+    </div>
+  </div>
+  <div class="layui-col-md3">
+    <div class="layui-input-wrap">
+      <div class="layui-input-prefix">
+        <i class="layui-icon layui-icon-help"></i>
+      </div>
+      <input type="text" name="completion_status" placeholder="完成状态" lay-affix="clear" class="layui-input">
+    </div>
+  </div>
+  <div class="layui-btn-container layui-col-xs12">
+    <button class="layui-btn" lay-submit lay-filter="demo-table-search">Search</button>
+    <button type="reset" class="layui-btn layui-btn-primary" onclick="refreshPage()">Clear</button>
+    <script>
+      function refreshPage() {
+          // 刷新页面，等效于重新加载当前页面
+        layer.msg('已清空搜索条件', {icon: 1});
+        window.location.reload();
+        //layer.msg('已清空搜索条件', {icon: 1});
+      }
+    </script>
+  </div>
+</form>
       <table class="layui-hide" id="test" lay-filter="test"></table>
     </div>
     <script type="text/html" id="toolbarDemo">
@@ -108,15 +157,17 @@
     <script src="../static/layui.js"></script>
 <!--    <script src="../static/fetch_users.js"></script>-->
     <script>
-      layui.use(['table', 'dropdown', 'layer'], function(){
+      layui.use(['table', 'dropdown', 'layer', 'form', 'laydate'], function(){
         var table = layui.table;
         var dropdown = layui.dropdown;
         var layer = layui.layer;
+        var form = layui.form;
+        var laydate = layui.laydate;
 
         table.render({
           elem: '#test',
           url: '/admin/api/tasks',
-          height:630,
+          height:560,
           toolbar: '#toolbarDemo',
           defaultToolbar: ['filter', 'exports', 'print', {
             title: '提示',
@@ -137,10 +188,10 @@
           cols: [[
             {type: 'checkbox', fixed: 'left'},
             {field: 'id', fixed: 'left', width: 80, title: 'ID', sort: true, totalRow: '合计：'},
-            {field: 'drone_id', title: '无人机ID <i class="layui-icon layui-icon-tips layui-font-14" lay-event="username-tips" title="外键(Drone), 该字段开启了编辑功能" style="margin-left: 5px;"></i>', width: 150, hide: 0, edit: 'text'},
-            {field: 'stamp_time', title:'开始时间 <i class="layui-icon layui-icon-tips layui-font-14" lay-event="contact-tips" title="该字段开启了编辑功能" style="margin-left: 5px;"></i>', width: 150, hide: 0, edit: 'text'},
-            {field: 'completion_status', title:'是否完成 <i class="layui-icon layui-icon-tips layui-font-14" lay-event="contact-tips" title="该字段开启了编辑功能" style="margin-left: 5px;"></i>', width: 150, hide: 0, edit: 'text'},
-            {fixed: 'right', title:'操作', width: 134, minWidth: 125, templet: '#toolDemo'}
+            {field: 'drone_id', title: '无人机ID <i class="layui-icon layui-icon-tips layui-font-14" lay-event="username-tips" title="外键(Drone), 请谨慎编辑" style="margin-left: 5px;"></i>', hide: 0, edit: 'text'},
+            {field: 'start_time', title:'开始时间 <i class="layui-icon layui-icon-tips layui-font-14" lay-event="contact-tips" title="该字段开启了编辑功能" style="margin-left: 5px;"></i>', width: 180, hide: 0, edit: 'text'},
+            {field: 'completion_status', title:'是否完成 <i class="layui-icon layui-icon-tips layui-font-14" lay-event="contact-tips" title="该字段开启了编辑功能" style="margin-left: 5px;"></i>', hide: 0, edit: 'text'},
+            {fixed: 'right', title:'操作', minWidth: 125, templet: '#toolDemo'}
             // 其他字段
           ]],
           page: true,
@@ -177,6 +228,14 @@
                                     <i class="layui-icon layui-icon-about"></i>
                                   </div>
                                   <input type="text" name="drone_id" value="" lay-verify="required" placeholder="无人机ID" lay-reqtext="请填写无人机ID" autocomplete="off" class="layui-input">
+                                </div>
+                              </div>
+                              <div class="layui-form-item">
+                                <div class="layui-input-wrap">
+                                  <div class="layui-input-prefix">
+                                    <i class="layui-icon layui-icon-time"></i>
+                                  </div>
+                                  <input type="text" name="start_time" value="" lay-verify="required" placeholder="任务开始时间" lay-reqtext="请填写任务开始时间" autocomplete="off" class="layui-input">
                                 </div>
                               </div>
                               <div class="layui-form-item">
@@ -332,19 +391,53 @@
             update[field] = value;
             obj.update(update);
             // 重定向到当前页面，刷新数据
-            window.location.href = '/admin/manage_task';
+            setTimeout(function() {
+                window.location.href = '/admin/manage_task';
+            }, 800);  // 500毫秒后执行跳转
         } else {
             layer.msg('数据库同步失败：' + res.message, {icon: 2});
+            setTimeout(function() {
+                window.location.href = '/admin/manage_task';
+            }, 3000);  // 500毫秒后执行跳转
         }
     })
     .catch(error => {
         layer.msg('请求失败，请稍后重试', {icon: 2});
         console.error('错误信息:', error);
+        setTimeout(function() {
+                window.location.href = '/admin/manage_task';
+            }, 3000);
     });
 
 
 });
           }
+        });
+        laydate.render({
+          elem: '.demo-table-search-datetime-1',
+          type: 'datetime',
+          fullPanel: true
+        });
+        form.on('submit(demo-table-search)', function(data){
+          var field = data.field; // 获得表单字段
+          // 执行搜索重载
+          table.reload('test', {
+            page: {
+              curr: 1 // 重新从第 1 页开始
+            },
+            where: field, // 搜索的字段
+            done: function(res) {
+              if (res.code === 0) {
+                  layer.msg('搜索成功：' + res.msg, { icon: 1 });
+              } else {
+                  layer.msg('搜索失败：' + res.msg, { icon: 2 });
+              }
+            },
+            error: function() {
+              layer.msg('数据加载失败', { icon: 2 });
+            }
+          });
+          return false; // 阻止默认 form 跳转
         });
       });
     </script>

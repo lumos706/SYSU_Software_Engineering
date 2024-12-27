@@ -55,6 +55,7 @@ class Drone(db.Model):
         return self.drone_id
 
 class DeliveryTask(db.Model):
+    __tablename__ = 'deliverytask'  # 与数据库中实际的表名完全匹配
     task_id = db.Column(db.Integer, primary_key=True)
     drone_id = db.Column(db.Integer, db.ForeignKey('drone.drone_id'))
     start_time = db.Column(db.String(100))
@@ -71,7 +72,7 @@ class Package(db.Model):
     recipient_name = db.Column(db.String(100), nullable=False)
     recipient_address = db.Column(db.String(255), nullable=False)
     package_info = db.Column(db.Text, nullable=False)
-    task_id = db.Column(db.Integer, db.ForeignKey('delivery_task.task_id'))
+    task_id = db.Column(db.Integer, db.ForeignKey('deliverytask.task_id'))
     user_id = db.Column(db.Integer, db.ForeignKey('user.user_id'))
 
     def __repr__(self):

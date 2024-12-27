@@ -15,10 +15,13 @@
 </head>
 <body>
 <div class="layui-layout layui-layout-admin">
-  <div class="layui-header" >
+  <div class="layui-header layui-bg-cyan" >
     <div class="layui-logo layui-hide-xs layui-bg-green">
-      <dd><a href="{{ url_for('admin.dashboard') }}" class="white-text">无人机物流管理系统</a></dd>
+      <dd><a href="{{ url_for('admin.dashboard') }}" class="white-text layui-font-18">无人机物流管理系统</a></dd>
     </div>
+    <ul class="layui-nav layui-layout-left ">
+      <li class="layui-nav-item layui-hide-xs"><a href="{{ url_for('admin.manage_drone') }}" class="white-text layui-font-16">无人机管理</a></li>
+    </ul>
     <ul class="layui-nav layui-layout-right">
       <li class="layui-nav-item layui-hide layui-show-sm-inline-block">
         <a href="javascript:;">
@@ -46,9 +49,9 @@
       </li>
     </ul>
   </div>
-  <div class="layui-side layui-bg-black">
+  <div class="layui-side layui-bg-cyan">
     <div class="layui-side-scroll">
-      <ul class="layui-nav layui-nav-tree" lay-filter="test">
+      <ul class="layui-nav layui-nav-tree layui-bg-cyan" lay-filter="test">
         <li class="layui-nav-item layui-nav-itemed">
           <a href="javascript:">用户管理</a>
           <dl class="layui-nav-child">
@@ -84,6 +87,68 @@
   </div>
   <div class="layui-body">
     <div style="padding: 16px;">
+      <form class="layui-form layui-row layui-col-space16">
+   <div class="layui-col-md4">
+    <div class="layui-input-wrap">
+      <div class="layui-input-prefix">
+        <i class="layui-icon layui-icon-about"></i>
+      </div>
+      <input type="text" name="id" value="" placeholder="ID" class="layui-input" lay-affix="clear">
+    </div>
+  </div>
+  <div class="layui-col-md4">
+    <div class="layui-input-wrap">
+      <div class="layui-input-prefix">
+        <i class="layui-icon layui-icon-about"></i>
+      </div>
+      <input type="text" name="model" value="" placeholder="型号" class="layui-input" lay-affix="clear">
+    </div>
+  </div>
+  <div class="layui-col-md4">
+    <div class="layui-input-wrap">
+      <div class="layui-input-prefix">
+        <i class="layui-icon layui-icon-help"></i>
+      </div>
+      <input type="text" name="status" placeholder="状态" lay-affix="clear" class="layui-input">
+    </div>
+  </div>
+    <div class="layui-col-md4">
+    <div class="layui-input-wrap">
+      <div class="layui-input-prefix">
+        <i class="layui-icon layui-icon-date"></i>
+      </div>
+      <input type="text" name="manufacture_date" readonly placeholder="生产日期" class="layui-input demo-table-search-date">
+    </div>
+  </div>
+  <div class="layui-col-md4">
+    <div class="layui-input-wrap">
+      <div class="layui-input-prefix">
+        <i class="layui-icon layui-icon-location"></i>
+      </div>
+      <input type="text" name="location" placeholder="位置" lay-affix="clear" class="layui-input">
+    </div>
+  </div>
+  <div class="layui-col-md4">
+    <div class="layui-input-wrap">
+      <div class="layui-input-prefix">
+        <i class="layui-icon layui-icon-about"></i>
+      </div>
+      <input type="text" name="pilot_id" value="" placeholder="操作员ID" class="layui-input" lay-affix="clear">
+    </div>
+  </div>
+  <div class="layui-btn-container layui-col-xs12">
+    <button class="layui-btn" lay-submit lay-filter="demo-table-search">Search</button>
+    <button type="reset" class="layui-btn layui-btn-primary" onclick="refreshPage()">Clear</button>
+    <script>
+      function refreshPage() {
+          // 刷新页面，等效于重新加载当前页面
+        layer.msg('已清空搜索条件', {icon: 1});
+        window.location.reload();
+        //layer.msg('已清空搜索条件', {icon: 1});
+      }
+    </script>
+  </div>
+</form>
       <table class="layui-hide" id="test" lay-filter="test"></table>
     </div>
     <script type="text/html" id="toolbarDemo">
@@ -108,15 +173,17 @@
     <script src="../static/layui.js"></script>
 <!--    <script src="../static/fetch_users.js"></script>-->
     <script>
-      layui.use(['table', 'dropdown', 'layer'], function(){
+      layui.use(['table', 'dropdown', 'layer', 'form', 'laydate'], function(){
         var table = layui.table;
         var dropdown = layui.dropdown;
         var layer = layui.layer;
+        var form = layui.form;
+        var laydate = layui.laydate;
 
         table.render({
           elem: '#test',
           url: '/admin/api/drones',
-          height:630,
+          height: 505,
           toolbar: '#toolbarDemo',
           defaultToolbar: ['filter', 'exports', 'print', {
             title: '提示',
@@ -137,14 +204,14 @@
           cols: [[
             {type: 'checkbox', fixed: 'left'},
             {field: 'id', fixed: 'left', width: 80, title: 'ID', sort: true},
-            {field: 'model', title:'型号 <i class="layui-icon layui-icon-tips layui-font-14" lay-event="username-tips" title="该字段开启了编辑功能" style="margin-left: 5px;"></i>', fieldTitle: '型号', hide: 0, width:120, expandedMode: 'tips', edit: 'text'},
-            {field: 'status', title:'状态 <i class="layui-icon layui-icon-tips layui-font-14" lay-event="contact-tips" title="该字段开启了编辑功能" style="margin-left: 5px;"></i>', fieldTitle: '状态', hide: 0, width:120, expandedMode: 'tips', edit: 'text'},
-            {field: 'max_load_capacity', title:'最大载荷(KG) <i class="layui-icon layui-icon-tips layui-font-14" lay-event="contact-tips" title="该字段开启了编辑功能" style="margin-left: 5px;"></i>', width: 120, hide: 0, edit: 'text'},
-            {field: 'location', title:'位置 <i class="layui-icon layui-icon-tips layui-font-14" lay-event="contact-tips" title="该字段开启了编辑功能" style="margin-left: 5px;"></i>', width: 120, hide: 0, edit: 'text'},
-            {field: 'battery_level', title:'电量(%) <i class="layui-icon layui-icon-tips layui-font-14" lay-event="contact-tips" title="该字段开启了编辑功能" style="margin-left: 5px;"></i>', width: 120, hide: 0, edit: 'text'},
-            {field: 'manufacture_date', title:'生产时间 <i class="layui-icon layui-icon-tips layui-font-14" lay-event="contact-tips" title="该字段开启了编辑功能" style="margin-left: 5px;"></i>', width: 120, hide: 0, edit: 'text'},
-            {field: 'pilot_id', title:'操作员ID <i class="layui-icon layui-icon-tips layui-font-14" lay-event="contact-tips" title="外键(Pilot), 该字段开启了编辑功能" style="margin-left: 5px;"></i>', width: 120, hide: 0, edit: 'text'},
-            {fixed: 'right', title:'操作', width: 134, minWidth: 125, templet: '#toolDemo'}
+            {field: 'model', title:'型号 <i class="layui-icon layui-icon-tips layui-font-14" lay-event="username-tips" title="该字段开启了编辑功能" style="margin-left: 5px;"></i>', fieldTitle: '型号', hide: 0, minWidth:120, expandedMode: 'tips', edit: 'text'},
+            {field: 'status', title:'状态 <i class="layui-icon layui-icon-tips layui-font-14" lay-event="contact-tips" title="该字段开启了编辑功能" style="margin-left: 5px;"></i>', fieldTitle: '状态', hide: 0, minWidth:120, expandedMode: 'tips', edit: 'text'},
+            {field: 'max_load_capacity', title:'最大载荷(KG) <i class="layui-icon layui-icon-tips layui-font-14" lay-event="contact-tips" title="该字段开启了编辑功能" style="margin-left: 5px;"></i>', minWidth: 180, hide: 0, expandedMode: 'tips', edit: 'text'},
+            {field: 'location', title:'位置 <i class="layui-icon layui-icon-tips layui-font-14" lay-event="contact-tips" title="该字段开启了编辑功能" style="margin-left: 5px;"></i>', minWidth: 120, hide: 0, expandedMode: 'tips', edit: 'text'},
+            {field: 'battery_level', title:'电量(%) <i class="layui-icon layui-icon-tips layui-font-14" lay-event="contact-tips" title="该字段开启了编辑功能" style="margin-left: 5px;"></i>', minWidth: 120, hide: 0, expandedMode: 'tips', edit: 'text'},
+            {field: 'manufacture_date', title:'生产时间 <i class="layui-icon layui-icon-tips layui-font-14" lay-event="contact-tips" title="该字段开启了编辑功能" style="margin-left: 5px;"></i>', minWidth: 120, hide: 0, expandedMode: 'tips', edit: 'text'},
+            {field: 'pilot_id', title:'操作员ID <i class="layui-icon layui-icon-tips layui-font-14" lay-event="contact-tips" title="外键(Pilot), 请谨慎编辑" style="margin-left: 5px;"></i>', minWidth: 120, hide: 0, expandedMode: 'tips', edit: 'text'},
+            {fixed: 'right', title:'操作', minWidth: 125, templet: '#toolDemo'}
             // 其他字段
           ]],
           page: true,
@@ -376,21 +443,49 @@
             update[field] = value;
             obj.update(update);
             // 重定向到当前页面，刷新数据
-            window.location.href = '/admin/manage_drone';
+            setTimeout(function() {
+                window.location.href = '/admin/manage_drone';
+            }, 800);  // 500毫秒后执行跳转
         } else {
             layer.msg('数据库同步失败：' + res.message, {icon: 2});
+            setTimeout(function() {
+                window.location.href = '/admin/manage_drone';
+            }, 3000);  // 500毫秒后执行跳转
         }
     })
     .catch(error => {
         layer.msg('请求失败，请稍后重试', {icon: 2});
+        setTimeout(function() {
+                window.location.href = '/admin/manage_drone';
+            }, 3000);
         console.error('错误信息:', error);
     });
-
-
 });
-
-
           }
+        });
+        laydate.render({
+          elem: '.demo-table-search-date'
+        });
+        form.on('submit(demo-table-search)', function(data){
+          var field = data.field; // 获得表单字段
+          // 执行搜索重载
+          table.reload('test', {
+            page: {
+              curr: 1 // 重新从第 1 页开始
+            },
+            where: field, // 搜索的字段
+            done: function(res) {
+              if (res.code === 0) {
+                  layer.msg('搜索成功：' + res.msg, { icon: 1 });
+              } else {
+                  layer.msg('搜索失败：' + res.msg, { icon: 2 });
+              }
+            },
+            error: function() {
+              layer.msg('数据加载失败', { icon: 2 });
+            }
+          });
+          return false; // 阻止默认 form 跳转
         });
       });
     </script>

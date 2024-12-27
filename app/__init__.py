@@ -19,6 +19,7 @@ def create_app():
 
     db.app = app
     db.init_app(app)
+    migrate = Migrate(app, db)
     # sql = text('SELECT * FROM user')
     # with app.app_context():  # 确保在应用上下文中执行
     #     result = db.session.execute(sql)

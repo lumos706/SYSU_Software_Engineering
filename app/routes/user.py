@@ -1,15 +1,17 @@
-from flask import Blueprint, render_template, request, redirect, url_for
-from flask_login import current_user
+import random
 
-from app.models import Package
+from flask import Blueprint, render_template, request, redirect, url_for, jsonify
+from flask_login import current_user
+from sqlalchemy import func
+from werkzeug.security import generate_password_hash
+
 from app import db
+from app.models import User, Drone, Pilot, Admin, DeliveryTask, Package
 bp = Blueprint('user', __name__)
 
 @bp.route('/')
 def dashboard():
-    user_id = current_user.user_id
-    # packages = Package.query.filter_by(user_id=user_id).all()
-    return render_template('user.html')
+    return render_template('user.html', user=current_user)
 
 @bp.route('/cancel_package/<int:package_id>')
 def cancel_package(package_id):

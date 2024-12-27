@@ -15,10 +15,13 @@
 </head>
 <body>
 <div class="layui-layout layui-layout-admin">
-  <div class="layui-header" >
+  <div class="layui-header layui-bg-cyan" >
     <div class="layui-logo layui-hide-xs layui-bg-green">
-      <dd><a href="{{ url_for('admin.dashboard') }}" class="white-text">无人机物流管理系统</a></dd>
+      <dd><a href="{{ url_for('admin.dashboard') }}" class="white-text layui-font-18">无人机物流管理系统</a></dd>
     </div>
+    <ul class="layui-nav layui-layout-left ">
+      <li class="layui-nav-item layui-hide-xs"><a href="{{ url_for('admin.manage_package') }}" class="white-text layui-font-16">包裹管理</a></li>
+    </ul>
     <ul class="layui-nav layui-layout-right">
       <li class="layui-nav-item layui-hide layui-show-sm-inline-block">
         <a href="javascript:;">
@@ -46,9 +49,9 @@
       </li>
     </ul>
   </div>
-  <div class="layui-side layui-bg-black">
+  <div class="layui-side layui-bg-cyan">
     <div class="layui-side-scroll">
-      <ul class="layui-nav layui-nav-tree" lay-filter="test">
+      <ul class="layui-nav layui-nav-tree layui-bg-cyan" lay-filter="test">
         <li class="layui-nav-item layui-nav-itemed">
           <a href="javascript:">用户管理</a>
           <dl class="layui-nav-child">
@@ -84,6 +87,52 @@
   </div>
   <div class="layui-body">
     <div style="padding: 16px;">
+      <form class="layui-form layui-row layui-col-space16">
+   <div class="layui-col-md3">
+    <div class="layui-input-wrap">
+      <div class="layui-input-prefix">
+        <i class="layui-icon layui-icon-about"></i>
+      </div>
+      <input type="text" name="id" value="" placeholder="ID" class="layui-input" lay-affix="clear">
+    </div>
+  </div>
+  <div class="layui-col-md3">
+    <div class="layui-input-wrap">
+      <div class="layui-input-prefix">
+        <i class="layui-icon layui-icon-username"></i>
+      </div>
+      <input type="text" name="recipient_name" value="" placeholder="收货人姓名" class="layui-input" lay-affix="clear">
+    </div>
+  </div>
+  <div class="layui-col-md3">
+    <div class="layui-input-wrap">
+      <div class="layui-input-prefix">
+        <i class="layui-icon layui-icon-about"></i>
+      </div>
+      <input type="text" name="task_id" value="" placeholder="任务ID" class="layui-input" lay-affix="clear">
+    </div>
+  </div>
+    <div class="layui-col-md3">
+    <div class="layui-input-wrap">
+      <div class="layui-input-prefix">
+        <i class="layui-icon layui-icon-about"></i>
+      </div>
+      <input type="text" name="user_id" value="" placeholder="用户ID" class="layui-input" lay-affix="clear">
+    </div>
+  </div>
+  <div class="layui-btn-container layui-col-xs12">
+    <button class="layui-btn" lay-submit lay-filter="demo-table-search">Search</button>
+    <button type="reset" class="layui-btn layui-btn-primary" onclick="refreshPage()">Clear</button>
+    <script>
+      function refreshPage() {
+          // 刷新页面，等效于重新加载当前页面
+        layer.msg('已清空搜索条件', {icon: 1});
+        window.location.reload();
+        //layer.msg('已清空搜索条件', {icon: 1});
+      }
+    </script>
+  </div>
+</form>
       <table class="layui-hide" id="test" lay-filter="test"></table>
     </div>
     <script type="text/html" id="toolbarDemo">
@@ -108,15 +157,16 @@
     <script src="../static/layui.js"></script>
 <!--    <script src="../static/fetch_users.js"></script>-->
     <script>
-      layui.use(['table', 'dropdown', 'layer'], function(){
+      layui.use(['table', 'dropdown', 'layer', 'form'], function(){
         var table = layui.table;
         var dropdown = layui.dropdown;
         var layer = layui.layer;
+        var form = layui.form;
 
         table.render({
           elem: '#test',
           url: '/admin/api/packages',
-          height:630,
+          height:560,
           toolbar: '#toolbarDemo',
           defaultToolbar: ['filter', 'exports', 'print', {
             title: '提示',
@@ -137,12 +187,12 @@
           cols: [[
             {type: 'checkbox', fixed: 'left'},
             {field: 'id', fixed: 'left', width: 80, title: 'ID', sort: true, totalRow: '合计：'},
-            {field: 'recipient_name', title:'收件人姓名 <i class="layui-icon layui-icon-tips layui-font-14" lay-event="username-tips" title="该字段开启了编辑功能" style="margin-left: 5px;"></i>', fieldTitle: '收件人姓名', hide: 0, width:150, expandedMode: 'tips', edit: 'text'},
-            {field: 'recipient_address', title:'收件人地址 <i class="layui-icon layui-icon-tips layui-font-14" lay-event="contact-tips" title="该字段开启了编辑功能" style="margin-left: 5px;"></i>', width: 150, hide: 0, edit: 'text'},
-            {field: 'package_info', title:'包裹信息 <i class="layui-icon layui-icon-tips layui-font-14" lay-event="contact-tips" title="该字段开启了编辑功能" style="margin-left: 5px;"></i>', width: 150, hide: 0, edit: 'text'},
-            {field: 'task_id', title:'任务ID <i class="layui-icon layui-icon-tips layui-font-14" lay-event="contact-tips" title="外键(Task), 该字段开启了编辑功能" style="margin-left: 5px;"></i>', width: 150, hide: 0, edit: 'text'},
-            {field: 'user_id', title:'用户ID <i class="layui-icon layui-icon-tips layui-font-14" lay-event="contact-tips" title="外键(User), 该字段开启了编辑功能" style="margin-left: 5px;"></i>', width: 150, hide: 0, edit: 'text'},
-            {fixed: 'right', title:'操作', width: 134, minWidth: 125, templet: '#toolDemo'}
+            {field: 'recipient_name', title:'收件人姓名 <i class="layui-icon layui-icon-tips layui-font-14" lay-event="username-tips" title="该字段开启了编辑功能" style="margin-left: 5px;"></i>', hide: 0, minWidth:150, expandedMode: 'tips', edit: 'text'},
+            {field: 'recipient_address', title:'收件人地址 <i class="layui-icon layui-icon-tips layui-font-14" lay-event="contact-tips" title="该字段开启了编辑功能" style="margin-left: 5px;"></i>', minWidth: 150, hide: 0, expandedMode: 'tips', edit: 'text'},
+            {field: 'package_info', title:'包裹信息 <i class="layui-icon layui-icon-tips layui-font-14" lay-event="contact-tips" title="该字段开启了编辑功能" style="margin-left: 5px;"></i>', minWidth: 150, hide: 0, expandedMode: 'tips', edit: 'text'},
+            {field: 'task_id', title:'任务ID <i class="layui-icon layui-icon-tips layui-font-14" lay-event="contact-tips" title="外键(Task), 该字段开启了编辑功能" style="margin-left: 5px;"></i>', minWidth: 150, hide: 0, expandedMode: 'tips', edit: 'text'},
+            {field: 'user_id', title:'用户ID <i class="layui-icon layui-icon-tips layui-font-14" lay-event="contact-tips" title="外键(User), 该字段开启了编辑功能" style="margin-left: 5px;"></i>', minWidth: 150, hide: 0, expandedMode: 'tips', edit: 'text'},
+            {fixed: 'right', title:'操作', minWidth: 125, templet: '#toolDemo'}
             // 其他字段
           ]],
           page: true,
@@ -331,48 +381,73 @@
         });
 
         table.on('edit(test)', function(obj) {
-    var field = obj.field; // 被编辑的字段
-    var value = obj.value; // 编辑后的值
-    var data = obj.data;   // 当前整行数据
+          var field = obj.field; // 被编辑的字段
+          var value = obj.value; // 编辑后的值
+          var data = obj.data;   // 当前整行数据
 
-    // 显示编辑成功提示
-    layer.msg('编辑成功，正在同步数据库...', {icon: 1});
+          // 显示编辑成功提示
+          layer.msg('编辑成功，正在同步数据库...', {icon: 1});
 
-    // 使用表单格式提交数据
-    var formData = new FormData();
-    formData.append('id', data.id);        // 用户 ID
-    formData.append('field', field);      // 被编辑的字段
-    formData.append('value', value);      // 编辑后的值
+          // 使用表单格式提交数据
+          var formData = new FormData();
+          formData.append('id', data.id);        // 用户 ID
+          formData.append('field', field);      // 被编辑的字段
+          formData.append('value', value);      // 编辑后的值
 
-    // 发送 AJAX 请求到后端
-    fetch('/admin/update_package', {
-        method: 'POST',
-        body: formData
-    })
-    .then(response => response.json())
-    .then(res => {
-        if (res.success) {
-            layer.msg('数据库同步成功', {icon: 1});
-            // 更新当前行显示（可选）
-            var update = {};
-            update[field] = value;
-            obj.update(update);
-            // 重定向到当前页面，刷新数据
-            window.location.href = '/admin/manage_package';
-        } else {
-            layer.msg('数据库同步失败：' + res.message, {icon: 2});
-        }
-    })
-    .catch(error => {
-        layer.msg('请求失败，请稍后重试', {icon: 2});
-        console.error('错误信息:', error);
-    });
-
-
-});
-
-
+          // 发送 AJAX 请求到后端
+          fetch('/admin/update_package', {
+              method: 'POST',
+              body: formData
+          })
+          .then(response => response.json())
+          .then(res => {
+              if (res.success) {
+                  layer.msg('数据库同步成功', {icon: 1});
+                  // 更新当前行显示（可选）
+                  var update = {};
+                  update[field] = value;
+                  obj.update(update);
+                  // 重定向到当前页面，刷新数据
+                  setTimeout(function() {
+                      window.location.href = '/admin/manage_package';
+                  }, 800);  // 500毫秒后执行跳转
+              } else {
+                  layer.msg('数据库同步失败：' + res.message, {icon: 2});
+                  setTimeout(function() {
+                      window.location.href = '/admin/manage_package';
+                  }, 3000);  // 500毫秒后执行跳转
+              }
+          })
+          .catch(error => {
+              layer.msg('请求失败，请稍后重试', {icon: 2});
+              setTimeout(function() {
+                window.location.href = '/admin/manage_package';
+            }, 3000);
+              console.error('错误信息:', error);
+          });
+            });
           }
+        });
+        form.on('submit(demo-table-search)', function(data){
+          var field = data.field; // 获得表单字段
+          // 执行搜索重载
+          table.reload('test', {
+            page: {
+              curr: 1 // 重新从第 1 页开始
+            },
+            where: field, // 搜索的字段
+            done: function(res) {
+              if (res.code === 0) {
+                  layer.msg('搜索成功：' + res.msg, { icon: 1 });
+              } else {
+                  layer.msg('搜索失败：' + res.msg, { icon: 2 });
+              }
+            },
+            error: function() {
+              layer.msg('数据加载失败', { icon: 2 });
+            }
+          });
+          return false; // 阻止默认 form 跳转
         });
       });
     </script>

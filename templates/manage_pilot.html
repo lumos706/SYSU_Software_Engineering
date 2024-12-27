@@ -15,10 +15,13 @@
 </head>
 <body>
 <div class="layui-layout layui-layout-admin">
-  <div class="layui-header" >
+  <div class="layui-header layui-bg-cyan" >
     <div class="layui-logo layui-hide-xs layui-bg-green">
-      <dd><a href="{{ url_for('admin.dashboard') }}" class="white-text">无人机物流管理系统</a></dd>
+      <dd><a href="{{ url_for('admin.dashboard') }}" class="white-text layui-font-18">无人机物流管理系统</a></dd>
     </div>
+    <ul class="layui-nav layui-layout-left ">
+      <li class="layui-nav-item layui-hide-xs"><a href="{{ url_for('admin.manage_pilot') }}" class="white-text layui-font-16">操作员管理</a></li>
+    </ul>
     <ul class="layui-nav layui-layout-right">
       <li class="layui-nav-item layui-hide layui-show-sm-inline-block">
         <a href="javascript:;">
@@ -46,9 +49,9 @@
       </li>
     </ul>
   </div>
-  <div class="layui-side layui-bg-black">
+  <div class="layui-side layui-bg-cyan">
     <div class="layui-side-scroll">
-      <ul class="layui-nav layui-nav-tree" lay-filter="test">
+      <ul class="layui-nav layui-nav-tree layui-bg-cyan" lay-filter="test">
         <li class="layui-nav-item layui-nav-itemed">
           <a href="javascript:">用户管理</a>
           <dl class="layui-nav-child">
@@ -84,6 +87,44 @@
   </div>
   <div class="layui-body">
     <div style="padding: 16px;">
+      <form class="layui-form layui-row layui-col-space16">
+   <div class="layui-col-md4">
+    <div class="layui-input-wrap">
+      <div class="layui-input-prefix">
+        <i class="layui-icon layui-icon-about"></i>
+      </div>
+      <input type="text" name="id" value="" placeholder="ID" class="layui-input" lay-affix="clear">
+    </div>
+  </div>
+  <div class="layui-col-md4">
+    <div class="layui-input-wrap">
+      <div class="layui-input-prefix">
+        <i class="layui-icon layui-icon-username"></i>
+      </div>
+      <input type="text" name="name" value="" placeholder="姓名" class="layui-input" lay-affix="clear">
+    </div>
+  </div>
+  <div class="layui-col-md4">
+    <div class="layui-input-wrap">
+      <div class="layui-input-prefix">
+        <i class="layui-icon layui-icon-cellphone"></i>
+      </div>
+      <input type="text" name="contact_info" placeholder="联系方式" lay-affix="clear" class="layui-input">
+    </div>
+  </div>
+  <div class="layui-btn-container layui-col-xs12">
+    <button class="layui-btn" lay-submit lay-filter="demo-table-search">Search</button>
+    <button type="reset" class="layui-btn layui-btn-primary" onclick="refreshPage()">Clear</button>
+    <script>
+      function refreshPage() {
+          // 刷新页面，等效于重新加载当前页面
+        layer.msg('已清空搜索条件', {icon: 1});
+        window.location.reload();
+        //layer.msg('已清空搜索条件', {icon: 1});
+      }
+    </script>
+  </div>
+</form>
       <table class="layui-hide" id="test" lay-filter="test"></table>
     </div>
     <script type="text/html" id="toolbarDemo">
@@ -108,15 +149,16 @@
     <script src="../static/layui.js"></script>
 <!--    <script src="../static/fetch_users.js"></script>-->
     <script>
-      layui.use(['table', 'dropdown', 'layer'], function(){
+      layui.use(['table', 'dropdown', 'layer', 'form'], function(){
         var table = layui.table;
         var dropdown = layui.dropdown;
         var layer = layui.layer;
+        var form = layui.form;
 
         table.render({
           elem: '#test',
           url: '/admin/api/pilots',
-          height:630,
+          height:560,
           toolbar: '#toolbarDemo',
           defaultToolbar: ['filter', 'exports', 'print', {
             title: '提示',
@@ -137,11 +179,11 @@
           cols: [[
             {type: 'checkbox', fixed: 'left'},
             {field: 'id', fixed: 'left', width: 80, title: 'ID', sort: true},
-            {field: 'name', title:'姓名 <i class="layui-icon layui-icon-tips layui-font-14" lay-event="username-tips" title="该字段开启了编辑功能" style="margin-left: 5px;"></i>', fieldTitle: '用户名', hide: 0, width:150, expandedMode: 'tips', edit: 'text'},
-            {field: 'contact_info', title:'联系方式 <i class="layui-icon layui-icon-tips layui-font-14" lay-event="contact-tips" title="该字段开启了编辑功能" style="margin-left: 5px;"></i>', fieldTitle: '联系方式', hide: 0, width:150, expandedMode: 'tips', edit: 'text'},
-            {field: 'login_credentials', title:'登录凭证 <i class="layui-icon layui-icon-tips layui-font-14" lay-event="contact-tips" title="该字段开启了编辑功能" style="margin-left: 5px;"></i>', width: 150, hide: 0, expandedMode: 'tips',edit: 'text'},
-            {field: 'password', title:'密码 <i class="layui-icon layui-icon-tips layui-font-14" lay-event="contact-tips" title="该字段开启了编辑功能" style="margin-left: 5px;"></i>', width: 150, hide: 0, expandedMode: 'tips',edit: 'text'},
-            {fixed: 'right', title:'操作', width: 134, minWidth: 125, templet: '#toolDemo'}
+            {field: 'name', title:'姓名 <i class="layui-icon layui-icon-tips layui-font-14" lay-event="username-tips" title="该字段开启了编辑功能" style="margin-left: 5px;"></i>', fieldTitle: '用户名', hide: 0, minWidth:150, expandedMode: 'tips', edit: 'text'},
+            {field: 'contact_info', title:'联系方式 <i class="layui-icon layui-icon-tips layui-font-14" lay-event="contact-tips" title="该字段开启了编辑功能" style="margin-left: 5px;"></i>', fieldTitle: '联系方式', hide: 0, minWidth:150, expandedMode: 'tips', edit: 'text'},
+            {field: 'login_credentials', title:'登录凭证 <i class="layui-icon layui-icon-tips layui-font-14" lay-event="contact-tips" title="该字段开启了编辑功能" style="margin-left: 5px;"></i>', minWidth: 150, hide: 0, expandedMode: 'tips',edit: 'text'},
+            {field: 'password', title:'密码 <i class="layui-icon layui-icon-tips layui-font-14" lay-event="contact-tips" title="该字段开启了编辑功能" style="margin-left: 5px;"></i>', minWidth: 150, hide: 0, expandedMode: 'tips',edit: 'text'},
+            {fixed: 'right', title:'操作', minWidth: 125, templet: '#toolDemo'}
             // 其他字段
           ]],
           page: true,
@@ -349,21 +391,46 @@
             update[field] = value;
             obj.update(update);
             // 重定向到当前页面，刷新数据
-            window.location.href = '/admin/manage_pilot';
+            setTimeout(function() {
+                window.location.href = '/admin/manage_pilot';
+            }, 800);  // 500毫秒后执行跳转
         } else {
             layer.msg('数据库同步失败：' + res.message, {icon: 2});
+            setTimeout(function() {
+                window.location.href = '/admin/manage_pilot';
+            }, 3000);  // 500毫秒后执行跳转
         }
     })
     .catch(error => {
         layer.msg('请求失败，请稍后重试', {icon: 2});
+        setTimeout(function() {
+                window.location.href = '/admin/manage_pilot';
+            }, 3000);
         console.error('错误信息:', error);
     });
-
-
 });
-
-
           }
+        });
+        form.on('submit(demo-table-search)', function(data){
+          var field = data.field; // 获得表单字段
+          // 执行搜索重载
+          table.reload('test', {
+            page: {
+              curr: 1 // 重新从第 1 页开始
+            },
+            where: field, // 搜索的字段
+            done: function(res) {
+              if (res.code === 0) {
+                  layer.msg('搜索成功：' + res.msg, { icon: 1 });
+              } else {
+                  layer.msg('搜索失败：' + res.msg, { icon: 2 });
+              }
+            },
+            error: function() {
+              layer.msg('数据加载失败', { icon: 2 });
+            }
+          });
+          return false; // 阻止默认 form 跳转
         });
       });
     </script>

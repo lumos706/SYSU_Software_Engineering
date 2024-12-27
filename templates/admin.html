@@ -15,10 +15,13 @@
 </head>
 <body>
 <div class="layui-layout layui-layout-admin">
-  <div class="layui-header">
+  <div class="layui-header layui-bg-cyan">
     <div class="layui-logo layui-hide-xs layui-bg-green">
-      <dd><a href="{{ url_for('admin.dashboard') }}" class="white-text">无人机物流管理系统</a></dd>
+      <dd><a href="{{ url_for('admin.dashboard') }}" class="white-text layui-font-18">无人机物流管理系统</a></dd>
     </div>
+    <ul class="layui-nav layui-layout-left layui-bg-cyan">
+      <li class="layui-nav-item layui-hide-xs"><a href="{{ url_for('admin.dashboard') }}" class="white-text layui-font-16">主菜单</a></li>
+    </ul>
     <ul class="layui-nav layui-layout-right">
       <li class="layui-nav-item layui-hide layui-show-sm-inline-block">
         <a href="javascript:;">
@@ -46,10 +49,10 @@
       </li>
     </ul>
   </div>
-  <div class="layui-side layui-bg-black">
+  <div class="layui-side layui-bg-cyan">
     <div class="layui-side-scroll">
       <!-- 左侧导航区域（可配合layui已有的垂直导航） -->
-      <ul class="layui-nav layui-nav-tree" lay-filter="test">
+      <ul class="layui-nav layui-nav-tree layui-bg-cyan" lay-filter="test">
         <li class="layui-nav-item">
           <a class="" href="javascript:;">用户管理</a>
           <dl class="layui-nav-child">
