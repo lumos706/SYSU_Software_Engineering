@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>飞行员管理界面</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="../static/css/layui.css" rel="stylesheet">
+  <script src="../static/layui.js"></script>
+  <style>
+    .white-text {
+      color: white;
+    }
+  </style>
+</head>
+<body>
+<div class="layui-layout layui-layout-admin">
+  <!-- Header -->
+  <div class="layui-header">
+    <div class="layui-logo layui-bg-blue">
+      无人机物流管理系统
+    </div>
+    <ul class="layui-nav layui-layout-right">
+      <li class="layui-nav-item">
+        <a href="javascript:;">
+          <img src="//unpkg.com/outeres@0.0.10/img/layui/icon-v2.png" class="layui-nav-img">
+          {{ pilot.name | default('未登录用户') }}
+        </a>
+        <dl class="layui-nav-child">
+          <dd><a href="javascript:;" onclick="showProfile()">个人信息</a></dd>
+          <dd><a href="{{ url_for('auth.logout') }}">登出</a></dd>
+        </dl>
+      </li>
+    </ul>
+  </div>
+
+  <!-- Sidebar -->
+  <div class="layui-side layui-bg-black">
+    <div class="layui-side-scroll">
+      <ul class="layui-nav layui-nav-tree">
+        <li class="layui-nav-item">
+          <a href="javascript:;">任务管理</a>
+          <dl class="layui-nav-child">
+            <dd><a href="javascript:;" onclick="viewUnassignedPackages()">查看未分配包裹</a></dd>
+          </dl>
+        </li>
+        <li class="layui-nav-item">
+          <a href="javascript:;">无人机管理</a>
+          <dl class="layui-nav-child">
+            <dd><a href="javascript:;" onclick="viewMyDrones()">查看我的无人机</a></dd>
+          </dl>
+        </li>
+        <li class="layui-nav-item">
+          <a href="javascript:;">账户管理</a>
+          <dl class="layui-nav-child">
+            <dd><a href="javascript:;" onclick="openEditProfile()">修改个人信息</a></dd>
+            <dd><a href="javascript:;" onclick="openEditCredentials()">修改登录凭据</a></dd>
+          </dl>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="layui-body" style="padding: 16px;">
+    <blockquote class="layui-elem-quote">欢迎使用无人机物流管理系统！</blockquote>
+
+    <!-- 动态内容将被 JavaScript 插入 -->
+    <div id="dynamic-content"></div>
+  </div>
+
+  <!-- Footer -->
+</div>
+
+<script>
+// 修改个人信息
+function openEditProfile() {
+  layui.use('layer', function() {
+    var layer = layui.layer;
+    layer.open({
+      type: 1,
+      title: '修改个人信息',
+      area: ['500px', '400px'],
+      content: `
+        <form action="/pilot/update_info" method="POST" style="padding: 16px;">
+          <div class="layui-form-item">
+            <label class="layui-form-label">联系方式</label>
+            <div class="layui-input-block">
+              <input type="text" name="contact" required placeholder="请输入联系方式" autocomplete="off" class="layui-input" value="{{ pilot.contact_info }}">
+            </div>
+          </div>
+          <div class="layui-form-item">
+            <button class="layui-btn layui-btn-fluid" type="submit">提交</button>
+          </div>
+        </form>`
+    });
+  });
+}
+
+// 修改密码
+function openEditCredentials() {
+  layui.use('layer', function() {
+    var layer = layui.layer;
+    layer.open({
+      type: 1,
+      title: '修改登录凭据',
+      area: ['500px', '300px'],
+      content: `
+        <form action="/pilot/update_credentials" method="POST" style="padding: 16px;">
+          <div class="layui-form-item">
+            <label class="layui-form-label">新密码</label>
+            <div class="layui-input-block">
+              <input type="password" name="password" required placeholder="请输入新密码" autocomplete="off" class="layui-input">
+            </div>
+          </div>
+          <div class="layui-form-item">
+            <button class="layui-btn layui-btn-fluid" type="submit">提交</button>
+          </div>
+        </form>`
+    });
+  });
+}
+
+// 查看个人信息
+function showProfile() {
+  layui.use('layer', function () {
+    var layer = layui.layer;
+
+    fetch('/pilot/profile')
+      .then(response => response.json())
+      .then(data => {
+        const content = `
+          <div style="padding: 16px;">
+            <p><b>姓名:</b> ${data.name}</p>
+            <p><b>联系方式:</b> ${data.contact_info}</p>
+          </div>
+        `;
+        layer.open({
+          type: 1,
+          title: '个人信息',
+          area: ['500px', '300px'],
+          content: content,
+        });
+      })
+      .catch(error => {
+        console.error('Error fetching profile:', error);
+        layer.msg('加载个人信息失败，请稍后重试！', { icon: 2 });
+      });
+  });
+}
+
+// 查看未分配包裹
+
+function viewUnassignedPackages() {
+  fetch('/pilot/unassigned_packages')
+    .then(response => response.json())
+    .then(data => {
+      let content = `
+        <table class="layui-table">
+          <thead>
+            <tr>
+              <th>包裹ID</th>
+              <th>收件人</th>
+              <th>地址</th>
+              <th>选择无人机</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
+      data.packages.forEach(pkg => {
+        content += `
+          <tr>
+            <td>${pkg.package_id}</td>
+            <td>${pkg.recipient_name}</td>
+            <td>${pkg.recipient_address}</td>
+            <td>
+              <select id="drone-select-${pkg.package_id}" class="layui-input">
+                ${data.drones.map(drone => `
+                  <option value="${drone.drone_id}">${drone.model} (${drone.drone_id})</option>
+                `).join('')}
+              </select>
+            </td>
+            <td>
+              <button class="layui-btn layui-btn-primary" onclick="assignPackage(${pkg.package_id})">分配</button>
+            </td>
+          </tr>
+        `;
+      });
+      content += '</tbody></table>';
+      document.getElementById('dynamic-content').innerHTML = content;
+    })
+    .catch(error => {
+      console.error('Error fetching packages:', error);
+    });
+}
+
+// 分配包裹
+function assignPackage(packageId) {
+  const droneId = document.getElementById(`drone-select-${packageId}`).value;
+  fetch(`/pilot/assign_package/${packageId}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ drone_id: droneId }),
+  })
+    .then(response => response.json())
+    .then(data => {
+      layui.use('layer', function () {
+        const layer = layui.layer;
+        layer.msg(data.message, { icon: 1 });
+      });
+    })
+    .catch(error => {
+      layui.use('layer', function () {
+        const layer = layui.layer;
+        layer.msg(`分配失败: ${error.message}`, { icon: 2 });
+      });
+    });
+}
+
+
+
+
+// 查看我的无人机
+function viewMyDrones() {
+  fetch('/pilot/my_drones')
+    .then(response => response.json())
+    .then(data => {
+      let content = `
+        <table class="layui-table">
+          <thead>
+            <tr>
+              <th>无人机ID</th>
+              <th>型号</th>
+              <th>状态</th>
+              <th>电池电量</th>
+              <th>位置</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
+      data.forEach(drone => {
+        const statusLabel = drone.status === 'Active' ? '可用' : '繁忙';
+        content += `
+          <tr>
+            <td>${drone.drone_id}</td>
+            <td>${drone.model}</td>
+            <td>${statusLabel}</td>
+            <td>${drone.battery_level}%</td>
+            <td>${drone.location}</td>
+            <td><button class="layui-btn layui-btn-primary" onclick="viewDroneTasks(${drone.drone_id})">查看任务</button></td>
+          </tr>
+        `;
+      });
+      content += `</tbody></table>`;
+      document.getElementById('dynamic-content').innerHTML = content;
+    })
+    .catch(error => {
+      console.error('Error fetching drones:', error);
+    });
+}
+
+// View tasks for a specific drone
+// 查看无人机任务
+function viewDroneTasks(droneId) {
+  fetch(`/pilot/drone_tasks/${droneId}`)
+    .then(response => response.json())
+    .then(data => {
+      let content = `
+        <h3>无人机任务列表</h3>
+        <table class="layui-table">
+          <thead>
+            <tr>
+              <th>任务ID</th>
+              <th>开始时间</th>
+              <th>完成状态</th>
+              <th>收件人</th>
+              <th>收件地址</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
+      data.forEach(task => {
+        content += `
+          <tr>
+            <td>${task.task_id}</td>
+            <td>${task.start_time}</td>
+            <td>${task.completion_status}</td>
+            <td>${task.recipient_name}</td>
+            <td>${task.recipient_address}</td>
+          </tr>
+        `;
+      });
+      content += '</tbody></table>';
+      document.getElementById('dynamic-content').innerHTML = content;
+    })
+    .catch(error => {
+      console.error('Error fetching tasks:', error);
+    });
+}
+
+
+
+
+
+</script>
+</body>
+</html>
