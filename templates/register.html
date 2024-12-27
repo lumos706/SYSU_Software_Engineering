@@ -3,8 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Demo</title>
-  <!-- 请勿在项目正式环境中引用该 layui.css 地址 -->
+  <title>注册用户</title>
   <link href="../static/css/layui.css" rel="stylesheet">
 </head>
 <body>
@@ -54,7 +53,7 @@
     </div>
     <div class="layui-form-item">
       <input type="checkbox" name="agreement" lay-verify="required" lay-skin="primary" title="同意">
-      <a href="terms.html" target="_blank" style="position: relative; top: 6px; left: -15px;">
+      <a href="{{ url_for('auth.terms') }}" target="_blank" style="position: relative; top: 6px; left: -15px;">
         <ins>用户协议</ins>
       </a>
     </div>
@@ -71,7 +70,6 @@
   </div>
 </form>
 
-<!-- 请勿在项目正式环境中引用该 layui.js 地址 -->
 <script src="../static/layui.js"></script>
 <script>
 layui.use(function(){

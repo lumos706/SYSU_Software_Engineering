@@ -50,7 +50,7 @@
     </div>
     <div class="layui-form-item">
       <input type="checkbox" name="remember" lay-skin="primary" title="记住密码">
-      <a href="forget.html" style="float: right; margin-top: 7px;">忘记密码？</a>
+      <a href="{{ url_for('auth.forget') }}" style="float: right; margin-top: 7px;">忘记密码？</a>
     </div>
     <div class="layui-form-item">
       <button class="layui-btn layui-btn-fluid" lay-submit lay-filter="demo-login">登录</button>
@@ -67,7 +67,6 @@
   </div>
 </form>
 
-<!-- 请勿在项目正式环境中引用该 layui.js 地址 -->
 <script src="../static/layui.js"></script>
 {% if error_message and error_message!='code_error' %}
 <script>

@@ -96,7 +96,7 @@ def Login_admin():
 def register():
     if request.method == 'POST':
         if 'login' in request.form:
-            return redirect(url_for('auth.login_user'))
+            return redirect(url_for('auth.Login_user'))
         username = request.form['username']
         contact_info = request.form['contact_info']
         password = request.form['password']
@@ -110,10 +110,18 @@ def register():
             new_user = User(username=username, password=hashed_password, contact_info=contact_info)
             db.session.add(new_user)
             db.session.commit()
-            return redirect(url_for('auth.login_user'))
+            return redirect(url_for('auth.Login_user'))
     if request.method == 'GET':
         return render_template('register.html')
 
+
+@bp.route('/terms')
+def terms():
+    return render_template('terms.html')
+
+@bp.route('/forget')
+def forget():
+    return render_template('forget.html')
 
 @bp.route('/logout')
 def logout():
