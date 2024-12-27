@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>用户管理界面</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="../static/css/layui.css" rel="stylesheet">
+  <script src="../static/layui.js"></script>
+  <style>
+    .white-text {
+      color: white;
+    }
+  </style>
+</head>
+<body>
+<div class="layui-layout layui-layout-admin">
+  <!-- Header -->
+  <div class="layui-header">
+    <div class="layui-logo layui-bg-green">
+      无人机物流管理系统
+    </div>
+    <ul class="layui-nav layui-layout-right">
+      <li class="layui-nav-item">
+        <a href="javascript:;">
+          <img src="//unpkg.com/outeres@0.0.10/img/layui/icon-v2.png" class="layui-nav-img">
+          {{ user.username | default('未登录用户') }}
+        </a>
+        <dl class="layui-nav-child">
+          <dd><a href="javascript:;" onclick="showProfile()">个人信息</a></dd>
+          <dd><a href="{{ url_for('auth.logout') }}">登出</a></dd>
+        </dl>
+      </li>
+    </ul>
+  </div>
+
+  <!-- Sidebar -->
+  <div class="layui-side layui-bg-black">
+    <div class="layui-side-scroll">
+      <ul class="layui-nav layui-nav-tree">
+        <li class="layui-nav-item">
+          <a href="javascript:;">包裹管理</a>
+          <dl class="layui-nav-child">
+            <dd><a href="javascript:;" onclick="openAddPackage()">新增包裹</a></dd>
+          </dl>
+        </li>
+        <li class="layui-nav-item">
+          <a href="javascript:;">账户管理</a>
+          <dl class="layui-nav-child">
+            <dd><a href="javascript:;" onclick="openEditProfile()">修改个人信息</a></dd>
+            <dd><a href="javascript:;" onclick="openEditCredentials()">修改登录凭据</a></dd>
+          </dl>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="layui-body" style="padding: 16px;">
+    <blockquote class="layui-elem-quote">欢迎使用无人机物流管理系统！</blockquote>
+
+    <!-- 包裹信息表格 -->
+    <table class="layui-table">
+        <thead>
+          <tr>
+            <th>包裹ID</th>
+            <th>收件人姓名</th>
+            <th>地址</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for package in packages %}
+          <tr>
+            <td>{{ package.package_id }}</td>
+            <td>{{ package.recipient_name }}</td>
+            <td>{{ package.recipient_address }}</td>
+            <td>
+              <button class="layui-btn layui-btn-normal" onclick="viewPackageStatus({{ package.package_id }})">更多信息</button>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+
+
+
+  <!-- Footer -->
+</div>
+
+<script>
+// Add Package
+function openAddPackage() {
+  layui.use('layer', function() {
+    var layer = layui.layer;
+    layer.open({
+      type: 1,
+      title: '新增包裹',
+      area: ['500px', '400px'],
+      content: `
+        <form action="/user/package/add" method="POST" style="padding: 16px;">
+          <div class="layui-form-item">
+            <label class="layui-form-label">收件人姓名</label>
+            <div class="layui-input-block">
+              <input type="text" name="recipient_name" required placeholder="请输入收件人姓名" autocomplete="off" class="layui-input">
+            </div>
+          </div>
+          <div class="layui-form-item">
+            <label class="layui-form-label">收件人地址</label>
+            <div class="layui-input-block">
+              <input type="text" name="recipient_address" required placeholder="请输入收件人地址" autocomplete="off" class="layui-input">
+            </div>
+          </div>
+          <div class="layui-form-item">
+            <label class="layui-form-label">包裹信息</label>
+            <div class="layui-input-block">
+              <textarea name="package_info" placeholder="请输入包裹信息" class="layui-textarea"></textarea>
+            </div>
+          </div>
+          <div class="layui-form-item">
+            <button class="layui-btn layui-btn-fluid" type="submit">提交</button>
+          </div>
+        </form>`
+    });
+  });
+}
+function viewPackageStatus(packageId) {
+  fetch(`/user/package/status/${packageId}`)
+    .then(response => response.json())
+    .then(data => {
+      const content = `
+        <p><b>包裹状态:</b> ${data.package_status}</p>
+        <p><b>收件人:</b> ${data.recipient_name}</p>
+        <p><b>地址:</b> ${data.recipient_address}</p>
+        <p><b>包裹信息:</b> ${data.package_info}</p>
+        ${data.task_start_time ? `<p><b>任务开始时间:</b> ${data.task_start_time}</p>` : ''}
+        ${data.drone_model ? `<p><b>无人机型号:</b> ${data.drone_model}</p>` : ''}
+      `;
+      layui.use('layer', function() {
+        var layer = layui.layer;
+        layer.open({
+          title: '包裹状态',
+          content: content,
+          area: ['500px', '400px'],
+        });
+      });
+    })
+    .catch(error => {
+      console.error('Error fetching package status:', error);
+    });
+}
+
+
+function openEditProfile() {
+  layui.use('layer', function() {
+    var layer = layui.layer;
+    layer.open({
+      type: 1,
+      title: '修改个人信息',
+      area: ['500px', '400px'],
+      content: `
+        <form action="/user/update_info" method="POST" style="padding: 16px;">
+          <div class="layui-form-item">
+            <label class="layui-form-label">联系方式</label>
+            <div class="layui-input-block">
+              <input type="text" name="contact" required placeholder="请输入联系方式" autocomplete="off" class="layui-input" value="{{ user.contact_info }}">
+            </div>
+          </div>
+          <div class="layui-form-item">
+            <button class="layui-btn layui-btn-fluid" type="submit">提交</button>
+          </div>
+        </form>`
+    });
+  });
+}
+
+function openEditCredentials() {
+  layui.use('layer', function() {
+    var layer = layui.layer;
+    layer.open({
+      type: 1,
+      title: '修改登录凭据',
+      area: ['500px', '300px'],
+      content: `
+        <form action="/user/update_credentials" method="POST" style="padding: 16px;">
+          <div class="layui-form-item">
+            <label class="layui-form-label">新密码</label>
+            <div class="layui-input-block">
+              <input type="password" name="password" required placeholder="请输入新密码" autocomplete="off" class="layui-input">
+            </div>
+          </div>
+          <div class="layui-form-item">
+            <button class="layui-btn layui-btn-fluid" type="submit">提交</button>
+          </div>
+        </form>`
+    });
+  });
+}
+
+function showProfile() {
+  // 使用 layui 弹窗展示用户信息
+  layui.use('layer', function () {
+    var layer = layui.layer;
+
+    // 发送请求获取用户信息
+    fetch('/user/profile')
+      .then(response => response.json())
+      .then(data => {
+        const content = `
+          <div style="padding: 16px;">
+            <p><b>用户名:</b> ${data.username}</p>
+            <p><b>联系方式:</b> ${data.contact_info}</p>
+          </div>
+        `;
+        layer.open({
+          type: 1,
+          title: '个人信息',
+          area: ['500px', '300px'],
+          content: content,
+        });
+      })
+      .catch(error => {
+        console.error('Error fetching profile:', error);
+        layer.msg('加载个人信息失败，请稍后重试！', { icon: 2 });
+      });
+  });
+}
+
+</script>
+</body>
+</html>
