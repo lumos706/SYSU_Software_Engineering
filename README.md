@@ -43,3 +43,6 @@
 
 运行create.py或在MySQL中新建名为"Drone_system"的数据库并运行drone_system.sql
 
+
+## Stargazers over time
+[![Stargazers over time](https://starchart.cc/lumos706/Database_Proj.svg?variant=adaptive)](https://starchart.cc/lumos706/Database_Proj)
