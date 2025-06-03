@@ -4,7 +4,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, jsonif
 from flask_login import current_user
 from sqlalchemy import func
 from werkzeug.security import generate_password_hash
-
+from sqlalchemy.sql import text
 from app import db
 from app.models import User, Drone, Pilot, Admin, DeliveryTask, Package
 
@@ -163,7 +163,7 @@ def bulk_register_user():
     try:
         users = []
         max_id = db.session.query(func.max(User.user_id)).scalar() or 0
-        for i in range(max_id + 1, max_id + 11):  # 循环生成 1000 个用户
+        for i in range(max_id + 1, max_id + 11):  # 循环生成 10 个用户
             username = f"user{i}"
             contact_info = f"user{i}@example.com"
             password = f"password{i}"
@@ -506,10 +506,20 @@ def delete_user(user_id):
     user = User.query.get(user_id)
     db.session.delete(user)
     db.session.commit()
-    entries = db.session.query(User).order_by(User.user_id).all()
-    for new_id, entry in enumerate(entries, start=1):
-        entry.id = new_id
-    db.session.commit()  # 提交 ID 更新操作
+    # 获取所有已存在的 ID
+    existing_ids = db.session.query(User.user_id).order_by(User.user_id).all()
+    existing_ids = [id[0] for id in existing_ids]  # 提取 ID 列表
+
+    # 找到第一个空闲的 ID
+    new_auto_increment = 1
+    for i in range(1, max(existing_ids) + 2):  # 遍历从 1 到最大 ID + 1 的范围
+        if i not in existing_ids:
+            new_auto_increment = i
+            break
+
+    # 设置自增点
+    db.session.execute(text(f"ALTER TABLE user AUTO_INCREMENT = {new_auto_increment}"))
+    db.session.commit()
     return redirect(url_for('admin.manage_user'))
 
 
@@ -518,9 +528,19 @@ def delete_pilot(pilot_id):
     pilot = Pilot.query.get(pilot_id)
     db.session.delete(pilot)
     db.session.commit()
-    entries = db.session.query(Pilot).order_by(Pilot.pilot_id).all()
-    for new_id, entry in enumerate(entries, start=1):
-        entry.id = new_id
+    # 获取所有已存在的 ID
+    existing_ids = db.session.query(Pilot.pilot_id).order_by(Pilot.pilot_id).all()
+    existing_ids = [id[0] for id in existing_ids]  # 提取 ID 列表
+
+    # 找到第一个空闲的 ID
+    new_auto_increment = 1
+    for i in range(1, max(existing_ids) + 2):  # 遍历从 1 到最大 ID + 1 的范围
+        if i not in existing_ids:
+            new_auto_increment = i
+            break
+
+    # 设置自增点
+    db.session.execute(text(f"ALTER TABLE pilot AUTO_INCREMENT = {new_auto_increment}"))
     db.session.commit()
     return redirect(url_for('admin.manage_pilot'))
 
@@ -530,9 +550,19 @@ def delete_drone(drone_id):
     drone = Drone.query.get(drone_id)
     db.session.delete(drone)
     db.session.commit()
-    entries = db.session.query(Drone).order_by(Drone.drone_id).all()
-    for new_id, entry in enumerate(entries, start=1):
-        entry.id = new_id
+    # 获取所有已存在的 ID
+    existing_ids = db.session.query(Drone.drone_id).order_by(Drone.drone_id).all()
+    existing_ids = [id[0] for id in existing_ids]  # 提取 ID 列表
+
+    # 找到第一个空闲的 ID
+    new_auto_increment = 1
+    for i in range(1, max(existing_ids) + 2):  # 遍历从 1 到最大 ID + 1 的范围
+        if i not in existing_ids:
+            new_auto_increment = i
+            break
+
+    # 设置自增点
+    db.session.execute(text(f"ALTER TABLE drone AUTO_INCREMENT = {new_auto_increment}"))
     db.session.commit()
     return redirect(url_for('admin.manage_drone'))
 
@@ -542,9 +572,19 @@ def delete_package(package_id):
     package = Package.query.get(package_id)
     db.session.delete(package)
     db.session.commit()
-    entries = db.session.query(Package).order_by(Package.package_id).all()
-    for new_id, entry in enumerate(entries, start=1):
-        entry.id = new_id
+    # 获取所有已存在的 ID
+    existing_ids = db.session.query(Package.package_id).order_by(Package.package_id).all()
+    existing_ids = [id[0] for id in existing_ids]  # 提取 ID 列表
+
+    # 找到第一个空闲的 ID
+    new_auto_increment = 1
+    for i in range(1, max(existing_ids) + 2):  # 遍历从 1 到最大 ID + 1 的范围
+        if i not in existing_ids:
+            new_auto_increment = i
+            break
+
+    # 设置自增点
+    db.session.execute(text(f"ALTER TABLE package AUTO_INCREMENT = {new_auto_increment}"))
     db.session.commit()
     return redirect(url_for('admin.manage_package'))
 
@@ -554,9 +594,19 @@ def delete_task(task_id):
     task = DeliveryTask.query.get(task_id)
     db.session.delete(task)
     db.session.commit()
-    entries = db.session.query(DeliveryTask).order_by(DeliveryTask.task_id).all()
-    for new_id, entry in enumerate(entries, start=1):
-        entry.id = new_id
+    # 获取所有已存在的 ID
+    existing_ids = db.session.query(DeliveryTask.task_id).order_by(DeliveryTask.task_id).all()
+    existing_ids = [id[0] for id in existing_ids]  # 提取 ID 列表
+
+    # 找到第一个空闲的 ID
+    new_auto_increment = 1
+    for i in range(1, max(existing_ids) + 2):  # 遍历从 1 到最大 ID + 1 的范围
+        if i not in existing_ids:
+            new_auto_increment = i
+            break
+
+    # 设置自增点
+    db.session.execute(text(f"ALTER TABLE deliverytask AUTO_INCREMENT = {new_auto_increment}"))
     db.session.commit()
     return redirect(url_for('admin.manage_task'))
 
@@ -574,11 +624,20 @@ def bulk_delete_user(ids):
         db.session.delete(user)
     db.session.commit()
 
-    # 重新排序 ID
-    entries = db.session.query(User).order_by(User.user_id).all()
-    for new_id, entry in enumerate(entries, start=1):
-        entry.user_id = new_id
-    db.session.commit()  # 提交 ID 更新操作
+    # 获取所有已存在的 ID
+    existing_ids = db.session.query(User.user_id).order_by(User.user_id).all()
+    existing_ids = [id[0] for id in existing_ids]  # 提取 ID 列表
+
+    # 找到第一个空闲的 ID
+    new_auto_increment = 1
+    for i in range(1, max(existing_ids) + 2):  # 遍历从 1 到最大 ID + 1 的范围
+        if i not in existing_ids:
+            new_auto_increment = i
+            break
+
+    # 设置自增点
+    db.session.execute(text(f"ALTER TABLE user AUTO_INCREMENT = {new_auto_increment}"))
+    db.session.commit()
 
     return redirect(url_for('admin.manage_user'))
 
@@ -594,10 +653,19 @@ def bulk_delete_pilot(ids):
         db.session.delete(pilot)
     db.session.commit()
 
-    # 重新排序 ID
-    entries = db.session.query(Pilot).order_by(Pilot.pilot_id).all()
-    for new_id, entry in enumerate(entries, start=1):
-        entry.pilot_id = new_id
+    # 获取所有已存在的 ID
+    existing_ids = db.session.query(Pilot.pilot_id).order_by(Pilot.pilot_id).all()
+    existing_ids = [id[0] for id in existing_ids]  # 提取 ID 列表
+
+    # 找到第一个空闲的 ID
+    new_auto_increment = 1
+    for i in range(1, max(existing_ids) + 2):  # 遍历从 1 到最大 ID + 1 的范围
+        if i not in existing_ids:
+            new_auto_increment = i
+            break
+
+    # 设置自增点
+    db.session.execute(text(f"ALTER TABLE pilot AUTO_INCREMENT = {new_auto_increment}"))
     db.session.commit()  # 提交 ID 更新操作
 
     return redirect(url_for('admin.manage_pilot'))
@@ -614,10 +682,19 @@ def bulk_delete_drone(ids):
         db.session.delete(drone)
     db.session.commit()
 
-    # 重新排序 ID
-    entries = db.session.query(Drone).order_by(Drone.drone_id).all()
-    for new_id, entry in enumerate(entries, start=1):
-        entry.drone_id = new_id
+    # 获取所有已存在的 ID
+    existing_ids = db.session.query(Drone.drone_id).order_by(Drone.drone_id).all()
+    existing_ids = [id[0] for id in existing_ids]  # 提取 ID 列表
+
+    # 找到第一个空闲的 ID
+    new_auto_increment = 1
+    for i in range(1, max(existing_ids) + 2):  # 遍历从 1 到最大 ID + 1 的范围
+        if i not in existing_ids:
+            new_auto_increment = i
+            break
+
+    # 设置自增点
+    db.session.execute(text(f"ALTER TABLE drone AUTO_INCREMENT = {new_auto_increment}"))
     db.session.commit()
 
     return redirect(url_for('admin.manage_drone'))
@@ -634,10 +711,19 @@ def bulk_delete_package(ids):
         db.session.delete(package)
     db.session.commit()
 
-    # 重新排序 ID
-    entries = db.session.query(Package).order_by(Package.package_id).all()
-    for new_id, entry in enumerate(entries, start=1):
-        entry.package_id = new_id
+    # 获取所有已存在的 ID
+    existing_ids = db.session.query(Package.package_id).order_by(Package.package_id).all()
+    existing_ids = [id[0] for id in existing_ids]  # 提取 ID 列表
+
+    # 找到第一个空闲的 ID
+    new_auto_increment = 1
+    for i in range(1, max(existing_ids) + 2):  # 遍历从 1 到最大 ID + 1 的范围
+        if i not in existing_ids:
+            new_auto_increment = i
+            break
+
+    # 设置自增点
+    db.session.execute(text(f"ALTER TABLE package AUTO_INCREMENT = {new_auto_increment}"))
     db.session.commit()
 
     return redirect(url_for('admin.manage_package'))
@@ -654,10 +740,19 @@ def bulk_delete_task(ids):
         db.session.delete(task)
     db.session.commit()
 
-    # 重新排序 ID
-    entries = db.session.query(DeliveryTask).order_by(DeliveryTask.task_id).all()
-    for new_id, entry in enumerate(entries, start=1):
-        entry.task_id = new_id
+    # 获取所有已存在的 ID
+    existing_ids = db.session.query(DeliveryTask.task_id).order_by(DeliveryTask.task_id).all()
+    existing_ids = [id[0] for id in existing_ids]  # 提取 ID 列表
+
+    # 找到第一个空闲的 ID
+    new_auto_increment = 1
+    for i in range(1, max(existing_ids) + 2):  # 遍历从 1 到最大 ID + 1 的范围
+        if i not in existing_ids:
+            new_auto_increment = i
+            break
+
+    # 设置自增点
+    db.session.execute(text(f"ALTER TABLE deliverytask AUTO_INCREMENT = {new_auto_increment}"))
     db.session.commit()
 
     return redirect(url_for('admin.manage_task'))
