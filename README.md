@@ -36,7 +36,7 @@
 
 2. 进入项目目录并安装依赖:
    ```bash
-   cd Database_Proj
+   cd SYSU_Software_Engineering
    pip install -r requirements.txt
 
 
