@@ -32,7 +32,7 @@
 
 1. 克隆本仓库:
    ```bash
-   git clone https://github.com/lumos706/Database_Proj.git
+   git clone https://github.com/lumos706/SYSU_Software_Engineering.git
 
 2. 进入项目目录并安装依赖:
    ```bash
@@ -41,4 +41,4 @@
 
 
 ## Stargazers over time
-[![Stargazers over time](https://starchart.cc/lumos706/Database_Proj.svg?variant=adaptive)](https://starchart.cc/lumos706/Database_Proj)
+[![Stargazers over time](https://starchart.cc/lumos706/SYSU_Software_Engineering.svg?variant=adaptive)](https://starchart.cc/lumos706/SYSU_Software_Engineering)
