@@ -1,10 +1,10 @@
 # 无人机物流管理系统
 
-中山大学计算机学院数据库大作业
+中山大学计算机学院软件工程项目
 
 这是一个基于Flask框架构建的无人机物流管理系统。
 
-小组成员：陶宇卓，陈昱达，孙泽堃
+小组成员：陶宇卓，陈昱达，孙泽堃，刘苇嘉，李馨媛
 
 ## 目录
 
@@ -38,10 +38,6 @@
    ```bash
    cd Database_Proj
    pip install -r requirements.txt
-
-## 使用方法
-
-运行create.py或在MySQL中新建名为"Drone_system"的数据库并运行drone_system.sql
 
 
 ## Stargazers over time
